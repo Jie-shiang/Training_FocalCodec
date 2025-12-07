@@ -1,70 +1,18 @@
+#!/usr/bin/env python3
 """
-python focalcodec_batch_inference.py \
-    --base_audio_dir /mnt/Internal/jieshiang/Split_Result \
-    --librispeech_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/split/librispeech_test_clean_filtered_0.5s.csv \
-    --commonvoice_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/split/common_voice_zh_CN_train_filtered_0.5s.csv \
-    --models 12.5hz 25hz 50hz 50hz_2k 50hz_4k 50hz_65k \
-    --output_dir /mnt/Internal/jieshiang/Inference_Result \
-    --model_cache_dir /mnt/Internal/jieshiang/Model/FocalCodec \
-    --device cuda:1
+FocalCodec Batch Inference - Supports Fine-tuned Models
+Processes multiple audio files with optional fine-tuned checkpoints
 
-python focalcodec_batch_inference.py \
-    --base_audio_dir /mnt/Internal/jieshiang/Split_Result \
-    --librispeech_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/split/librispeech_test_clean_filtered_1.0s.csv \
-    --commonvoice_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/split/common_voice_zh_CN_train_filtered_1.0s.csv \
-    --models 12.5hz 25hz 50hz 50hz_2k 50hz_4k 50hz_65k \
-    --output_dir /mnt/Internal/jieshiang/Inference_Result \
-    --model_cache_dir /mnt/Internal/jieshiang/Model/FocalCodec \
-    --device cuda:1
-
-python focalcodec_batch_inference.py \
-    --base_audio_dir /mnt/Internal/jieshiang/Split_Result \
-    --librispeech_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/split/librispeech_test_clean_filtered_2.0s.csv \
-    --commonvoice_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/split/common_voice_zh_CN_train_filtered_2.0s.csv \
-    --models 12.5hz 25hz 50hz 50hz_2k 50hz_4k 50hz_65k \
-    --output_dir /mnt/Internal/jieshiang/Inference_Result \
-    --model_cache_dir /mnt/Internal/jieshiang/Model/FocalCodec \
-    --device cuda:1
-
-python focalcodec_batch_inference.py \
-    --base_audio_dir /mnt/Internal/jieshiang/Noise_Result \
-    --librispeech_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/noise/librispeech_test_clean_noise.csv \
-    --commonvoice_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/noise/common_voice_zh_CN_train_noise.csv \
-    --models 12.5hz 25hz 50hz 50hz_2k 50hz_4k 50hz_65k \
-    --output_dir /mnt/Internal/jieshiang/Inference_Result \
-    --model_cache_dir /mnt/Internal/jieshiang/Model/FocalCodec \
-    --device cuda:1 \
-    --is_noise
-
-
-python focalcodec_batch_inference.py \
-    --base_audio_dir /mnt/Internal/ASR \
-    --librispeech_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/librispeech_test_clean_filtered.csv \
-    --commonvoice_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/common_voice_zh_CN_train_filtered.csv \
-    --models 50hz_2k \
-    --output_dir /mnt/Internal/jieshiang/Inference_Result \
-    --model_cache_dir /mnt/Internal/jieshiang/Model/FocalCodec \
-    --checkpoint /mnt/Internal/jieshiang/Model/FocalCodec/checkpoints_encoder_finetune/best_model.pt \
-    --device cuda:1
-
-python focalcodec_batch_inference.py \
-    --base_audio_dir /mnt/Internal/ASR \
-    --librispeech_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/librispeech_test_clean_filtered.csv \
-    --commonvoice_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/common_voice_zh_CN_train_filtered.csv \
-    --models 50hz_2k \
-    --output_dir /mnt/Internal/jieshiang/Inference_Result/baseline \
-    --model_cache_dir /mnt/Internal/jieshiang/Model/FocalCodec \
-    --device cuda:1
-
-python focalcodec_batch_inference.py \
-    --base_audio_dir /mnt/Internal/ASR \
-    --librispeech_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/librispeech_test_clean_filtered.csv \
-    --commonvoice_csv /home/jieshiang/Desktop/GitHub/Codec_comparison/csv/common_voice_zh_CN_train_filtered.csv \
-    --models 50hz_2k \
-    --output_dir /mnt/Internal/jieshiang/Inference_Result/finetuned \
-    --model_cache_dir /mnt/Internal/jieshiang/Model/FocalCodec \
-    --checkpoint /mnt/Internal/jieshiang/Model/FocalCodec/checkpoints_encoder_finetune/best_model.pt \
-    --device cuda:1
+Usage:
+    # With fine-tuned model
+    python focalcodec_batch_inference.py \
+        --base_audio_dir /mnt/Internal/ASR \
+        --commonvoice_csv /path/to/chinese.csv \
+        --models 50hz_2k \
+        --output_dir /mnt/Internal/jieshiang/Inference_Result \
+        --model_cache_dir /mnt/Internal/jieshiang/Model/FocalCodec \
+        --checkpoint /path/to/best_model.pt \
+        --device cuda:0
 """
 
 import os
@@ -89,6 +37,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# Model configuration mapping
 MODEL_CONFIGS = {
     "12.5hz": {
         "config": "lucadellalib/focalcodec_12_5hz",
@@ -124,6 +73,7 @@ MODEL_CONFIGS = {
 
 
 class FocalCodecInferenceProcessor:
+    """FocalCodec inference processor with fine-tuned model support"""
     
     def __init__(
         self,
@@ -131,36 +81,56 @@ class FocalCodecInferenceProcessor:
         model_cache_dir: str,
         device: str = "cuda:0",
         force_reload: bool = False,
+        checkpoint_path: str = None
     ):
+        """
+        Initialize inference processor
         
         Args:
+            model_name: Model name (e.g., "50hz", "50hz_4k")
+            model_cache_dir: Model cache directory
+            device: Device to use (e.g., "cuda:0", "cpu")
+            force_reload: Force reload model from hub
+            checkpoint_path: Fine-tuned checkpoint path (optional)
         """
         self.model_name = model_name
         self.checkpoint_path = checkpoint_path
         
+        # Get model config
         if model_name not in MODEL_CONFIGS:
+            raise ValueError(f"Unsupported model: {model_name}. Available: {list(MODEL_CONFIGS.keys())}")
         
         model_info = MODEL_CONFIGS[model_name]
         self.model_config = model_info["config"]
         self.output_path = model_info["output_path"]
         self.is_streaming = model_info["is_streaming"]
         
+        # Modify output path if using checkpoint
         if checkpoint_path:
             self.output_path = self.output_path + "_finetuned"
         
         self.device = torch.device(device)
         self.model_cache_dir = model_cache_dir
         
+        logger.info(f"Loading model: {self.model_config}")
+        logger.info(f"Output path: {self.output_path}")
+        logger.info(f"Streaming model: {'Yes' if self.is_streaming else 'No'}")
+        logger.info(f"Device: {self.device}")
+        logger.info(f"Model cache: {self.model_cache_dir}")
         if checkpoint_path:
-            logger.info(f" Fine-tuned Checkpoint: {checkpoint_path}")
+            logger.info(f"🔑 Fine-tuned checkpoint: {checkpoint_path}")
         
+        # Set Hugging Face cache
         os.environ['HF_HOME'] = self.model_cache_dir
         os.environ['HUGGINGFACE_HUB_CACHE'] = self.model_cache_dir
         
+        # Load model
         self.codec = self._load_model(force_reload)
         
     def _load_model(self, force_reload: bool):
+        """Load FocalCodec model (with fine-tuned checkpoint support)"""
         try:
+            # Load base model via torch.hub
             codec = torch.hub.load(
                 repo_or_dir="lucadellalib/focalcodec",
                 model="focalcodec",
@@ -168,27 +138,38 @@ class FocalCodecInferenceProcessor:
                 force_reload=force_reload,
             )
             
+            # Load fine-tuned checkpoint if provided
             if self.checkpoint_path and os.path.exists(self.checkpoint_path):
+                logger.info(f"Loading fine-tuned checkpoint: {self.checkpoint_path}")
                 checkpoint = torch.load(self.checkpoint_path, map_location='cpu')
                 
+                # Load state dict
                 codec.load_state_dict(checkpoint['model_state_dict'])
                 
+                # Log training info
                 epoch = checkpoint.get('epoch', 'N/A')
                 val_loss = checkpoint.get('val_loss', 'N/A')
                 train_loss = checkpoint.get('train_loss', 'N/A')
                 
+                logger.info(f"✅ Checkpoint loaded successfully!")
                 logger.info(f"   Epoch: {epoch}")
                 logger.info(f"   Train Loss: {train_loss:.6f}" if isinstance(train_loss, float) else f"   Train Loss: {train_loss}")
                 logger.info(f"   Val Loss: {val_loss:.6f}" if isinstance(val_loss, float) else f"   Val Loss: {val_loss}")
             elif self.checkpoint_path:
+                logger.warning(f"⚠️ Checkpoint not found: {self.checkpoint_path}")
+                logger.warning("   Using original pre-trained model")
             
             codec = codec.to(self.device)
             codec.eval()
             codec.requires_grad_(False)
             
+            logger.info(f"Model loaded: {self.model_name}")
+            logger.info(f"Input SR: {codec.sample_rate_input} Hz")
+            logger.info(f"Output SR: {codec.sample_rate_output} Hz")
             
             return codec
         except Exception as e:
+            logger.error(f"Model load failed: {e}")
             raise
     
     @torch.no_grad()
@@ -199,61 +180,86 @@ class FocalCodecInferenceProcessor:
         original_sample_rate: int = None
     ) -> bool:
         """
+        Inference on single audio file
         
         Args:
+            audio_path: Input audio path
+            output_path: Output audio path
+            original_sample_rate: Original sample rate (None = use file SR)
         
         Returns:
+            bool: Success status
+        """
         try:
+            # Load audio
             sig, sample_rate = torchaudio.load(audio_path)
             
+            # Move to device
             sig = sig.to(self.device)
             
+            # Resample to model input SR
             if sample_rate != self.codec.sample_rate_input:
                 sig = torchaudio.functional.resample(
                     sig, sample_rate, self.codec.sample_rate_input
                 ).to(self.device)
             
+            # Encode
             toks = self.codec.sig_to_toks(sig)
             
+            # Decode
             rec_sig = self.codec.toks_to_sig(toks)
             
+            # Move to CPU
             rec_sig = rec_sig.cpu()
             
+            # Resample back to target SR if needed
             target_sr = original_sample_rate if original_sample_rate else sample_rate
             if self.codec.sample_rate_output != target_sr:
                 rec_sig = torchaudio.functional.resample(
                     rec_sig, self.codec.sample_rate_output, target_sr
                 )
             
+            # Ensure output dir exists
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             
+            # Save reconstructed audio
             torchaudio.save(output_path, rec_sig, target_sr)
             
             return True
             
         except Exception as e:
+            logger.error(f"Processing failed {audio_path}: {e}")
             return False
 
 
 def extract_segment_length_from_csv(csv_path: str) -> Optional[str]:
+    """
+    Extract segment length from CSV filename
+    Example: librispeech_test_clean_filtered_0.5s.csv -> "0.5s"
     """
     filename = Path(csv_path).stem
     match = re.search(r'_(\d+\.?\d*s)$', filename)
     
     if match:
         segment_length = match.group(1)
+        logger.info(f"Detected segment length: {segment_length}")
         return segment_length
     else:
+        logger.info("No segment marker detected, assuming full audio")
         return None
 
 
 def load_segment_csv_data(csv_path: str, base_audio_dir: str, dataset_type: str) -> List[Dict]:
+    """Load CSV data (supports both segmented and full audio)"""
+    logger.info(f"Loading CSV: {csv_path}")
     df = pd.read_csv(csv_path)
     
+    # Check if segmented CSV
     required_segmented_columns = ['segment_file_name', 'segment_file_path', 'original_file_name']
     is_segmented = all(col in df.columns for col in required_segmented_columns)
     
     if is_segmented:
+        logger.info("Detected segmented CSV")
         audio_files = []
         segment_length = extract_segment_length_from_csv(csv_path)
         
@@ -277,11 +283,16 @@ def load_segment_csv_data(csv_path: str, base_audio_dir: str, dataset_type: str)
                     'segment_length': segment_length
                 })
             else:
+                logger.warning(f"Audio not found: {full_path}")
         
+        logger.info(f"Found {len(audio_files)} valid segmented audio files")
     else:
+        logger.info("Detected full audio CSV")
         required_complete_columns = ['file_name', 'file_path']
         if not all(col in df.columns for col in required_complete_columns):
             raise ValueError(
+                f"CSV missing required columns. Need: {required_complete_columns}\n"
+                f"Actual columns: {list(df.columns)}"
             )
         
         audio_files = []
@@ -303,7 +314,9 @@ def load_segment_csv_data(csv_path: str, base_audio_dir: str, dataset_type: str)
                     'dataset_type': dataset_type
                 })
             else:
+                logger.warning(f"Audio not found: {full_path}")
         
+        logger.info(f"Found {len(audio_files)} valid audio files")
     
     return audio_files
 
@@ -314,16 +327,20 @@ def process_segmented_dataset(
     output_base_dir: str,
     model_name: str
 ) -> Dict[str, int]:
+    """Process audio dataset"""
     stats = {'success': 0, 'failed': 0, 'total': len(audio_files)}
     
     if not audio_files:
+        logger.warning("No audio files to process")
         return stats
     
     is_segmented = 'segment_file_name' in audio_files[0]
     
+    logger.info(f"Processing {stats['total']} {'segmented' if is_segmented else 'full'} audio files...")
     
     os.makedirs(output_base_dir, exist_ok=True)
     
+    for file_info in tqdm(audio_files, desc=f"Processing {model_name}"):
         input_path = file_info['input_path']
         
         if is_segmented:
@@ -347,55 +364,91 @@ def process_segmented_dataset(
 
 def main():
     parser = argparse.ArgumentParser(
+        description="FocalCodec Batch Inference - Supports Fine-tuned Models",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
+Example usage:
 
-    python focalcodec_batch_inference_finetuned.py \\
+1. With fine-tuned model:
+    python focalcodec_batch_inference.py \\
         --base_audio_dir /mnt/Internal/ASR \\
         --commonvoice_csv /path/to/chinese.csv \\
         --models 50hz_2k \\
         --output_dir /mnt/Internal/jieshiang/Inference_Result \\
         --model_cache_dir /mnt/Internal/jieshiang/Model/FocalCodec \\
-        --checkpoint /mnt/Internal/jieshiang/Model/FocalCodec/checkpoints_encoder_finetune/best_model.pt \\
+        --checkpoint /path/to/best_model.pt \\
         --device cuda:1
 
-    python focalcodec_batch_inference_finetuned.py \\
+2. With original model (no --checkpoint):
+    python focalcodec_batch_inference.py \\
         --base_audio_dir /mnt/Internal/ASR \\
         --commonvoice_csv /path/to/chinese.csv \\
         --models 50hz_2k \\
         --output_dir /mnt/Internal/jieshiang/Inference_Result \\
         --model_cache_dir /mnt/Internal/jieshiang/Model/FocalCodec \\
         --device cuda:1
+        """
     )
     
+    # Required args
+    parser.add_argument('--base_audio_dir', type=str, required=True, help='Audio base directory')
+    parser.add_argument('--output_dir', type=str, required=True, help='Output base directory')
+    parser.add_argument('--model_cache_dir', type=str, required=True, help='Model cache directory')
     
+    # Dataset args
+    parser.add_argument('--librispeech_csv', type=str, default=None, help='LibriSpeech CSV file')
+    parser.add_argument('--commonvoice_csv', type=str, default=None, help='Common Voice CSV file')
     
+    # Model args
     parser.add_argument('--models', type=str, nargs='+', required=True,
                         choices=list(MODEL_CONFIGS.keys()),
+                        help=f'Models to use. Available: {list(MODEL_CONFIGS.keys())}')
     
+    # Checkpoint arg
     parser.add_argument('--checkpoint', type=str, default=None,
+                        help='Fine-tuned checkpoint path (e.g., best_model.pt)')
     
+    # Device args
+    parser.add_argument('--device', type=str, default='cuda:0', help='Device to use')
     
+    # Other args
+    parser.add_argument('--force_reload', action='store_true', help='Force reload model from hub')
+    parser.add_argument('--is_noise', action='store_true', help='Processing noise audio files')
     
     args = parser.parse_args()
     
+    # Check at least one dataset specified
     if not args.librispeech_csv and not args.commonvoice_csv:
+        parser.error("Must specify at least one dataset CSV (--librispeech_csv or --commonvoice_csv)")
     
+    # Check CUDA availability
     if 'cuda' in args.device and not torch.cuda.is_available():
+        logger.warning("CUDA not available, using CPU")
         args.device = 'cpu'
     
+    # Warning: checkpoint should match model config
     if args.checkpoint:
         logger.info("=" * 80)
+        logger.info("🔑 Fine-tuned Mode")
         logger.info("=" * 80)
         logger.info(f"Checkpoint: {args.checkpoint}")
+        logger.info("⚠️  Note: Ensure checkpoint matches model config!")
+        logger.info("   E.g., if checkpoint trained with 50hz_2k, use --models 50hz_2k")
         logger.info("=" * 80)
     
     logger.info("=" * 80)
+    logger.info("FocalCodec Batch Inference - Fine-tuned Model Support")
     logger.info("=" * 80)
+    logger.info(f"Audio base dir: {args.base_audio_dir}")
+    logger.info(f"Output dir: {args.output_dir}")
+    logger.info(f"Model cache: {args.model_cache_dir}")
+    logger.info(f"Models: {args.models}")
+    logger.info(f"Device: {args.device}")
     if args.checkpoint:
         logger.info(f"Checkpoint: {args.checkpoint}")
     logger.info("=" * 80)
     
+    # Load datasets
     all_datasets = []
     
     if args.librispeech_csv:
@@ -410,21 +463,28 @@ def main():
         )
         all_datasets.append(('commonvoice', commonvoice_files))
     
+    # Process each model
     for model_name in args.models:
         logger.info("=" * 80)
+        logger.info(f"Processing model: {model_name}")
         logger.info("=" * 80)
         
+        # Initialize processor (with checkpoint)
         processor = FocalCodecInferenceProcessor(
             model_name=model_name,
             model_cache_dir=args.model_cache_dir,
             device=args.device,
             force_reload=args.force_reload,
+            checkpoint_path=args.checkpoint
         )
         
+        # Process each dataset
         for dataset_name, audio_files in all_datasets:
+            logger.info(f"\nProcessing {dataset_name} dataset...")
             
             is_segmented = any('segment_length' in f for f in audio_files) if audio_files else False
             
+            # Build output path
             if args.is_noise:
                 output_subdir = os.path.join(
                     args.output_dir, processor.output_path, dataset_name, "noise"
@@ -439,6 +499,7 @@ def main():
                     args.output_dir, processor.output_path, dataset_name
                 )
             
+            logger.info(f"Output dir: {output_subdir}")
             
             stats = process_segmented_dataset(
                 audio_files=audio_files,
@@ -447,13 +508,21 @@ def main():
                 model_name=model_name
             )
             
+            logger.info(f"\n{dataset_name} processing complete:")
+            logger.info(f"  Total: {stats['total']}")
+            logger.info(f"  Success: {stats['success']}")
+            logger.info(f"  Failed: {stats['failed']}")
             if stats['total'] > 0:
+                logger.info(f"  Success rate: {stats['success']/stats['total']*100:.2f}%")
+            logger.info(f"  Output dir: {output_subdir}")
         
+        # Release GPU memory
         del processor
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
     
     logger.info("=" * 80)
+    logger.info("All processing complete!")
     logger.info("=" * 80)
 
 
