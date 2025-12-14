@@ -176,3 +176,9 @@ Evaluation metrics:
 - Speaker_Sim: Speaker similarity (higher is better)
 - dWER: WER degradation (lower is better, LibriSpeech)
 - dCER: CER degradation (lower is better, CommonVoice)
+
+## References
+
+- [FocalCodec Paper](https://arxiv.org/abs/2502.04465)
+- [FocalCodec GitHub](https://github.com/lucadellalib/focalcodec)
+- [PEFT Library](https://github.com/huggingface/peft)

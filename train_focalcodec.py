@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+FocalCodec Training with Whisper-tiny ASR Loss (Cross Entropy)
+Uses ground truth transcriptions to compute cross entropy loss
+"""
 
 import os
 import sys
@@ -32,7 +36,7 @@ LOG_DIR = '/mnt/Internal/jieshiang/Model/FocalCodec/logs'
 
 
 class AudioDataset(Dataset):
-    """Dataset for loading audio chunks from CSV file."""
+    """Dataset for loading audio chunks with transcriptions."""
 
     def __init__(
         self,
@@ -51,16 +55,19 @@ class AudioDataset(Dataset):
         self.chunks = []
 
         if self.augment:
-            self.augmentation = nn.Sequential(
-                # Simple augmentation pipeline (can be extended)
-            )
+            self.augmentation = nn.Sequential()
 
         df = pd.read_csv(csv_path)
+        
+        # 確認 CSV 有 transcription 欄位
+        if 'transcription' not in df.columns:
+            raise ValueError(f"CSV must have 'transcription' column! Found: {df.columns.tolist()}")
 
         for idx, row in tqdm(df.iterrows(), total=len(df), desc="Loading dataset"):
-            file_path = row['file_path']  # CSV column name is 'file_path'
+            file_path = row['file_path']
+            transcription = str(row['transcription']) if pd.notna(row['transcription']) else ""
 
-            # Convert relative path to absolute path (assuming base is /mnt/Internal/ASR)
+            # Convert relative path to absolute path
             if file_path.startswith('./'):
                 file_path = file_path.replace('./', '/mnt/Internal/ASR/', 1)
 
@@ -69,14 +76,13 @@ class AudioDataset(Dataset):
                 file_sr = info.sample_rate
                 file_num_frames = info.num_frames
             except:
-                continue  # Skip files that can't be read
+                continue
 
             expected_frames = int(file_num_frames * sample_rate / file_sr)
 
             if expected_frames >= self.chunk_size:
                 chunk_frames_in_source = int(self.chunk_size * file_sr / sample_rate)
                 hop_frames_in_source = int(self.hop_size * file_sr / sample_rate)
-
                 n_chunks = (file_num_frames - chunk_frames_in_source) // hop_frames_in_source + 1
 
                 for i in range(n_chunks):
@@ -85,7 +91,8 @@ class AudioDataset(Dataset):
                         'file_path': file_path,
                         'start': start_frame,
                         'num_frames': chunk_frames_in_source,
-                        'file_sr': file_sr
+                        'file_sr': file_sr,
+                        'transcription': transcription
                     })
 
                     if max_chunks and len(self.chunks) >= max_chunks:
@@ -129,28 +136,248 @@ class AudioDataset(Dataset):
         if self.augment:
             waveform = self.augmentation(waveform)
 
-        return waveform.contiguous()
+        return waveform.contiguous(), chunk_info['transcription']
 
 
-class FlexibleLoss(nn.Module):
+class WhisperASRLoss(nn.Module):
+    """
+    Whisper ASR-based loss using Cross Entropy
+    Computes CE between ground truth text and reconstructed audio transcription
+    """
+    
+    def __init__(self, device: str = "cuda", cache_dir: Optional[str] = None):
+        super().__init__()
+        self.device = device
+        self.cache_dir = cache_dir or "/mnt/Internal/jieshiang/Model/ASR"
+        
+        print(f"\n{'='*60}")
+        print(f"Loading Whisper-tiny ASR model")
+        print(f"{'='*60}")
+        
+        self._load_whisper()
+        
+        # Freeze Whisper model
+        self.whisper_model.eval()
+        for param in self.whisper_model.parameters():
+            param.requires_grad = False
+        
+        print(f"Whisper model loaded and frozen")
+        print(f"{'='*60}\n")
+    
+    def _load_whisper(self):
+        """Load Whisper-tiny model"""
+        try:
+            import whisper
+            
+            # 設定下載目錄
+            whisper_cache = os.path.join(self.cache_dir, "whisper")
+            os.makedirs(whisper_cache, exist_ok=True)
+            
+            os.environ['XDG_CACHE_HOME'] = whisper_cache
+            
+            self.whisper_model = whisper.load_model(
+                "tiny", 
+                device=self.device,
+                download_root=whisper_cache
+            )
+            
+            # 獲取 tokenizer
+            self.tokenizer = whisper.tokenizer.get_tokenizer(
+                multilingual=self.whisper_model.is_multilingual
+            )
+            
+            print(f"Whisper model cached at: {whisper_cache}")
+            
+        except ImportError:
+            raise ImportError("Please install openai-whisper: pip install openai-whisper")
+    
+    @torch.no_grad()
+    def encode_text_to_tokens(self, texts: List[str]) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        將文字編碼為 token IDs
+        
+        Returns:
+            tokens: [batch_size, max_len] token IDs
+            lengths: [batch_size] 每個序列的有效長度
+        """
+        import whisper
+        
+        batch_tokens = []
+        batch_lengths = []
+        
+        for text in texts:
+            # Whisper tokenization
+            # 加入 SOT (start of transcript) token
+            tokens = [self.tokenizer.sot]
+            tokens += self.tokenizer.encode(text)
+            tokens.append(self.tokenizer.eot)  # EOT (end of transcript)
+            
+            batch_tokens.append(tokens)
+            batch_lengths.append(len(tokens))
+        
+        # Pad to same length
+        max_len = max(batch_lengths)
+        padded_tokens = []
+        
+        for tokens in batch_tokens:
+            padded = tokens + [self.tokenizer.eot] * (max_len - len(tokens))
+            padded_tokens.append(padded)
+        
+        return (
+            torch.tensor(padded_tokens, device=self.device),
+            torch.tensor(batch_lengths, device=self.device)
+        )
+    
+    @torch.no_grad()
+    def get_whisper_encoder_output(self, audio: torch.Tensor) -> torch.Tensor:
+        """
+        獲取 Whisper encoder 的輸出
 
+        Args:
+            audio: [batch_size, samples]
+
+        Returns:
+            encoder_output: [batch_size, n_frames, n_embed]
+        """
+        import whisper
+
+        batch_size = audio.shape[0]
+        all_encoder_outputs = []
+
+        for i in range(batch_size):
+            audio_np = audio[i].cpu().numpy()
+
+            # Pad or trim audio to 30 seconds (480000 samples at 16kHz)
+            # Whisper expects exactly 30 seconds of audio
+            target_length = 16000 * 30  # 480000 samples
+            if len(audio_np) < target_length:
+                # Pad with zeros
+                audio_np = np.pad(audio_np, (0, target_length - len(audio_np)), mode='constant')
+            else:
+                # Trim to 30 seconds
+                audio_np = audio_np[:target_length]
+
+            # 獲取 mel spectrogram
+            mel = whisper.log_mel_spectrogram(audio_np).to(self.device)
+
+            # Encoder forward
+            encoder_output = self.whisper_model.encoder(mel.unsqueeze(0))
+            all_encoder_outputs.append(encoder_output)
+
+        return torch.cat(all_encoder_outputs, dim=0)
+    
+    def forward(
+        self,
+        original_audio: torch.Tensor,
+        reconstructed_audio: torch.Tensor,
+        ground_truth_texts: List[str]
+    ) -> Tuple[torch.Tensor, Dict[str, float]]:
+        """
+        計算 ASR Cross Entropy Loss
+        
+        Args:
+            original_audio: [batch_size, samples] - 不使用,但保留介面一致性
+            reconstructed_audio: [batch_size, samples] - 重建的音訊
+            ground_truth_texts: List[str] - Ground truth 文字
+        
+        Returns:
+            loss: ASR cross entropy loss
+            info: Loss information dictionary
+        """
+        
+        if not ground_truth_texts or all(t == "" for t in ground_truth_texts):
+            # 如果沒有 ground truth,返回零 loss
+            return torch.tensor(0.0, device=self.device), {'asr_loss': 0.0}
+        
+        batch_size = reconstructed_audio.shape[0]
+        
+        # 1. 將 ground truth 文字編碼為 tokens
+        gt_tokens, gt_lengths = self.encode_text_to_tokens(ground_truth_texts)
+        # gt_tokens: [batch_size, max_len]
+        
+        # 2. 獲取重建音訊的 encoder output
+        encoder_output = self.get_whisper_encoder_output(reconstructed_audio)
+        # encoder_output: [batch_size, n_audio_frames, n_embed]
+        
+        # 3. Decoder forward pass 獲取 logits
+        # Whisper decoder 是 autoregressive,需要逐步 decode
+        total_loss = 0.0
+        total_tokens = 0
+        
+        for i in range(batch_size):
+            # 當前樣本的 encoder output
+            enc_out = encoder_output[i:i+1]  # [1, n_frames, n_embed]
+            
+            # Ground truth tokens (包含 SOT 和 EOT)
+            tokens = gt_tokens[i]  # [max_len]
+            length = gt_lengths[i].item()
+            
+            # 使用 teacher forcing: input = tokens[:-1], target = tokens[1:]
+            # 即: 用前 N-1 個 token 預測第 N 個 token
+            input_tokens = tokens[:-1].unsqueeze(0)  # [1, seq_len-1]
+            target_tokens = tokens[1:length]  # [seq_len-1] (去掉最後的 padding)
+            
+            if len(target_tokens) == 0:
+                continue
+            
+            # Decoder forward
+            logits = self.whisper_model.decoder(input_tokens, enc_out)
+            # logits: [1, seq_len-1, vocab_size]
+            
+            # 計算 cross entropy
+            logits = logits[0, :len(target_tokens), :]  # [seq_len-1, vocab_size]
+            
+            # Cross entropy loss
+            loss = F.cross_entropy(
+                logits, 
+                target_tokens,
+                reduction='sum'
+            )
+            
+            total_loss += loss
+            total_tokens += len(target_tokens)
+        
+        # Average over tokens
+        if total_tokens > 0:
+            avg_loss = total_loss / total_tokens
+        else:
+            avg_loss = torch.tensor(0.0, device=self.device)
+        
+        info = {
+            'asr_loss': avg_loss.item(),
+            'asr_tokens': total_tokens
+        }
+        
+        return avg_loss, info
+
+
+class FlexibleLossWithASR(nn.Module):
+    """Loss function with Whisper ASR loss"""
+    
     def __init__(
         self,
         use_feature: bool = True,
         use_time: bool = False,
         use_mel: bool = False,
+        use_asr: bool = False,
         weight_feature: float = 1.0,
         weight_time: float = 0.3,
         weight_mel: float = 0.3,
-        sample_rate: int = 16000
+        weight_asr: float = 0.5,
+        sample_rate: int = 16000,
+        device: str = "cuda",
+        asr_cache_dir: Optional[str] = None
     ):
         super().__init__()
         self.use_feature = use_feature
         self.use_time = use_time
         self.use_mel = use_mel
+        self.use_asr = use_asr
         self.weight_feature = weight_feature
         self.weight_time = weight_time
         self.weight_mel = weight_mel
+        self.weight_asr = weight_asr
+        self.device = device
 
         if use_mel:
             self.mel_transform = T.MelSpectrogram(
@@ -158,6 +385,12 @@ class FlexibleLoss(nn.Module):
                 n_fft=1024,
                 hop_length=256,
                 n_mels=80
+            ).to(device)  # 移到正確的 device
+        
+        if use_asr:
+            self.asr_loss_module = WhisperASRLoss(
+                device=device,
+                cache_dir=asr_cache_dir
             )
 
     def forward(
@@ -165,27 +398,57 @@ class FlexibleLoss(nn.Module):
         original_audio: torch.Tensor,
         reconstructed_audio: torch.Tensor,
         original_features: torch.Tensor,
-        reconstructed_features: torch.Tensor
+        reconstructed_features: torch.Tensor,
+        ground_truth_texts: Optional[List[str]] = None
     ) -> Tuple[torch.Tensor, Dict[str, float]]:
         total_loss = 0
         loss_dict = {}
 
+        # Feature loss (encoder feature level) - handle different shapes
         if self.use_feature:
-            feature_loss = F.mse_loss(reconstructed_features, original_features)
+            # Features shape: [batch, n_frames, n_features]
+            # Align to same temporal length
+            min_frames = min(original_features.shape[1], reconstructed_features.shape[1])
+            orig_aligned = original_features[:, :min_frames, :]
+            recon_aligned = reconstructed_features[:, :min_frames, :]
+            
+            feature_loss = F.mse_loss(recon_aligned, orig_aligned)
             total_loss += self.weight_feature * feature_loss
             loss_dict['feature_loss'] = feature_loss.item()
 
+        # Time domain loss
         if self.use_time:
-            time_loss = F.l1_loss(reconstructed_audio, original_audio)
+            # Align audio lengths (reconstructed may be longer/shorter)
+            min_len = min(reconstructed_audio.shape[-1], original_audio.shape[-1])
+            recon_aligned = reconstructed_audio[..., :min_len]
+            orig_aligned = original_audio[..., :min_len]
+            
+            time_loss = F.l1_loss(recon_aligned, orig_aligned)
             total_loss += self.weight_time * time_loss
             loss_dict['time_loss'] = time_loss.item()
 
+        # Mel spectrogram loss
         if self.use_mel:
-            mel_orig = self.mel_transform(original_audio)
-            mel_recon = self.mel_transform(reconstructed_audio)
+            # Align audio lengths first
+            min_len = min(reconstructed_audio.shape[-1], original_audio.shape[-1])
+            recon_aligned = reconstructed_audio[..., :min_len]
+            orig_aligned = original_audio[..., :min_len]
+            
+            mel_orig = self.mel_transform(orig_aligned)
+            mel_recon = self.mel_transform(recon_aligned)
             mel_loss = F.l1_loss(mel_recon, mel_orig)
             total_loss += self.weight_mel * mel_loss
             loss_dict['mel_loss'] = mel_loss.item()
+        
+        # ASR loss (cross entropy with ground truth)
+        if self.use_asr and ground_truth_texts:
+            asr_loss, asr_info = self.asr_loss_module(
+                original_audio,
+                reconstructed_audio,
+                ground_truth_texts
+            )
+            total_loss += self.weight_asr * asr_loss
+            loss_dict.update(asr_info)
 
         loss_dict['total_loss'] = total_loss.item()
         return total_loss, loss_dict
@@ -227,21 +490,10 @@ class FocalCodecTrainer:
         self.freeze_components = freeze_components
 
         print("\n" + "="*60)
-        print("FocalCodec Trainer Initialization")
+        print("FocalCodec Training Configuration")
         print("="*60)
 
-        self._setup_training_state()
-
-        self._apply_lora(lora_config)
-
-        self.criterion = FlexibleLoss(**loss_config).to(device)
-
-        self._print_parameter_stats()
-
-    def _setup_training_state(self):
-        print("\nComponent Training Status:")
-        print("-" * 60)
-
+        # Setup training/freezing for each component
         components = {
             'encoder': self.model.encoder,
             'compressor': self.model.compressor,
@@ -250,183 +502,208 @@ class FocalCodecTrainer:
         }
 
         for name, component in components.items():
-            for param in component.parameters():
-                param.requires_grad = True
-
-            if self.freeze_components.get(name, False):
+            print(f"\n{name.upper()}:")
+            
+            # Apply LoRA if specified
+            if name in lora_config:
+                rank, alpha = lora_config[name]
+                components[name] = apply_lora_to_component(component, rank, alpha)
+            
+            # Set training mode
+            if train_components.get(name, False):
+                component.train()
+                for param in component.parameters():
+                    param.requires_grad = True
+                print(f"  Mode: TRAINING")
+            else:
+                component.eval()
                 for param in component.parameters():
                     param.requires_grad = False
-                status = "❄️  FROZEN"
-            elif self.train_components.get(name, False):
-                status = " TRAINING"
-            else:
+                print(f"  Mode: FROZEN (eval)")
+            
+            # Additional freeze if specified
+            if freeze_components.get(name, False):
                 for param in component.parameters():
                     param.requires_grad = False
-                status = "⏸️  DISABLED"
+                print(f"  Additional freeze applied")
 
-            print(f"  {name:15s}: {status}")
-
-        print(f"  {'quantizer':15s}: ⚙️  NON-PARAMETRIC (always frozen)")
-
-    def _apply_lora(self, lora_config: Dict[str, Optional[Tuple[int, int]]]):
-        print("\nLoRA Configuration:")
-        print("-" * 60)
-
-        components = {
-            'encoder': self.model.encoder,
-            'compressor': self.model.compressor,
-            'decompressor': self.model.decompressor,
-            'decoder': self.model.decoder
-        }
-
-        for name, component in components.items():
-            if not self.train_components.get(name, False):
-                print(f"  {name:15s}: Skipped (not training)")
-                continue
-
-            lora_params = lora_config.get(name)
-            if lora_params:
-                rank, alpha = lora_params
-                print(f"  {name:15s}: rank={rank}, alpha={alpha}")
-                setattr(self.model, name, apply_lora_to_component(component, rank, alpha))
-            else:
-                print(f"  {name:15s}: No LoRA")
-
-    def _print_parameter_stats(self):
-        print("\nParameter Statistics:")
-        print("-" * 60)
-
-        components = {
-            'encoder': self.model.encoder,
-            'compressor': self.model.compressor,
-            'decompressor': self.model.decompressor,
-            'decoder': self.model.decoder
-        }
-
-        total_params = 0
-        trainable_params = 0
-
-        for name, component in components.items():
-            params = sum(p.numel() for p in component.parameters())
-            train_params = sum(p.numel() for p in component.parameters() if p.requires_grad)
-
-            total_params += params
-            trainable_params += train_params
-
-            print(f"  {name:15s}: {params/1e6:>8.2f}M total, {train_params/1e6:>8.2f}M trainable")
-
-        print(f"  {'TOTAL':15s}: {total_params/1e6:>8.2f}M total, {trainable_params/1e6:>8.2f}M trainable")
-        print(f"  Trainable ratio: {100*trainable_params/total_params:.2f}%")
+        # Create loss function
+        self.loss_fn = FlexibleLossWithASR(**loss_config)
+        
+        print("\n" + "="*60)
+        print("Loss Configuration:")
+        for key, value in loss_config.items():
+            if key not in ['device', 'asr_cache_dir']:
+                print(f"  {key}: {value}")
         print("="*60 + "\n")
 
-    def train_epoch(
-        self,
-        train_loader: DataLoader,
-        optimizer: torch.optim.Optimizer,
-        epoch: int
-    ) -> Dict[str, float]:
+    def train_epoch(self, dataloader, optimizer, epoch):
         self.model.train()
-
-        total_losses = {}
-        num_batches = 0
-
-        pbar = tqdm(train_loader, desc=f"Epoch {epoch}")
-        for batch_idx, waveform in enumerate(pbar):
-            waveform = waveform.to(self.device)
-
+        
+        # Set components to appropriate modes
+        for name, should_train in self.train_components.items():
+            component = getattr(self.model, name)
+            if should_train:
+                component.train()
+            else:
+                component.eval()
+        
+        total_loss = 0
+        loss_components = {}
+        
+        pbar = tqdm(dataloader, desc=f"Epoch {epoch}")
+        for batch_idx, (audio, transcriptions) in enumerate(pbar):
+            audio = audio.to(self.device)
+            
             optimizer.zero_grad()
-
-            original_features = self.model.sig_to_feats(waveform)
-
-            codes = self.model.sig_to_codes(waveform)
-            reconstructed_features = self.model.codes_to_qfeats(codes)
-
-            reconstructed_audio = self.model.codes_to_sig(codes)
-
-            min_len = min(waveform.shape[-1], reconstructed_audio.shape[-1])
-            waveform = waveform[..., :min_len]
-            reconstructed_audio = reconstructed_audio[..., :min_len]
-
-            loss, loss_dict = self.criterion(
-                waveform,
+            
+            # Forward pass through codec using FocalCodec feature space API
+            # sig_to_feats: audio -> encoder features
+            # feats_to_lats: features -> compressed latents
+            # lats_to_codes: latents -> discrete codes
+            # codes_to_qfeats: codes -> quantized features (for decoder)
+            feats = self.model.sig_to_feats(audio)
+            lats = self.model.feats_to_lats(feats)
+            codes = self.model.lats_to_codes(lats)
+            qfeats = self.model.codes_to_qfeats(codes)
+            
+            # Reconstruct audio from quantized features
+            reconstructed_audio = self.model.feats_to_sig(qfeats)
+            
+            # For feature loss comparison
+            reconstructed_feats = self.model.sig_to_feats(reconstructed_audio)
+            
+            # Compute loss
+            loss, loss_dict = self.loss_fn(
+                audio,
                 reconstructed_audio,
-                original_features,
-                reconstructed_features
+                feats,
+                reconstructed_feats,
+                transcriptions
             )
-
+            
+            # Backward pass
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+            
+            # Gradient clipping
+            torch.nn.utils.clip_grad_norm_(
+                self.model.parameters(),
+                max_norm=1.0
+            )
+            
             optimizer.step()
-
+            
+            # Accumulate losses
+            total_loss += loss.item()
             for key, value in loss_dict.items():
-                if key not in total_losses:
-                    total_losses[key] = 0
-                total_losses[key] += value
-
-            num_batches += 1
-
-            pbar.set_postfix({'loss': f"{loss.item():.4f}"})
-
-        avg_losses = {k: v / num_batches for k, v in total_losses.items()}
-        return avg_losses
+                if key not in loss_components:
+                    loss_components[key] = 0
+                loss_components[key] += value
+            
+            # Update progress bar
+            pbar.set_postfix({
+                'loss': f"{loss.item():.4f}",
+                **{k: f"{v:.4f}" for k, v in loss_dict.items() if k != 'total_loss'}
+            })
+        
+        # Calculate epoch averages
+        n_batches = len(dataloader)
+        metrics = {
+            'total_loss': total_loss / n_batches
+        }
+        for key, value in loss_components.items():
+            if key != 'total_loss':
+                metrics[key] = value / n_batches
+        
+        return metrics
 
     @torch.no_grad()
-    def validate(self, val_loader: DataLoader) -> Dict[str, float]:
+    def validate(self, dataloader):
         self.model.eval()
-
-        total_losses = {}
-        num_batches = 0
-
-        for waveform in tqdm(val_loader, desc="Validating"):
-            waveform = waveform.to(self.device)
-
-            original_features = self.model.sig_to_feats(waveform)
-            codes = self.model.sig_to_codes(waveform)
-            reconstructed_features = self.model.codes_to_qfeats(codes)
-            reconstructed_audio = self.model.codes_to_sig(codes)
-
-            min_len = min(waveform.shape[-1], reconstructed_audio.shape[-1])
-            waveform = waveform[..., :min_len]
-            reconstructed_audio = reconstructed_audio[..., :min_len]
-
-            _, loss_dict = self.criterion(
-                waveform,
+        
+        total_loss = 0
+        loss_components = {}
+        
+        for audio, transcriptions in tqdm(dataloader, desc="Validation"):
+            audio = audio.to(self.device)
+            
+            # Forward pass using feature space API
+            feats = self.model.sig_to_feats(audio)
+            lats = self.model.feats_to_lats(feats)
+            codes = self.model.lats_to_codes(lats)
+            qfeats = self.model.codes_to_qfeats(codes)
+            reconstructed_audio = self.model.feats_to_sig(qfeats)
+            reconstructed_feats = self.model.sig_to_feats(reconstructed_audio)
+            
+            # Compute loss
+            loss, loss_dict = self.loss_fn(
+                audio,
                 reconstructed_audio,
-                original_features,
-                reconstructed_features
+                feats,
+                reconstructed_feats,
+                transcriptions
             )
-
+            
+            # Accumulate losses
+            total_loss += loss.item()
             for key, value in loss_dict.items():
-                if key not in total_losses:
-                    total_losses[key] = 0
-                total_losses[key] += value
+                if key not in loss_components:
+                    loss_components[key] = 0
+                loss_components[key] += value
+        
+        # Calculate averages
+        n_batches = len(dataloader)
+        metrics = {
+            'total_loss': total_loss / n_batches
+        }
+        for key, value in loss_components.items():
+            if key != 'total_loss':
+                metrics[key] = value / n_batches
+        
+        return metrics
 
-            num_batches += 1
+    def save_checkpoint(self, path, epoch, optimizer, metrics):
+        import shutil
 
-        avg_losses = {k: v / num_batches for k, v in total_losses.items()}
-        return avg_losses
+        # Check available disk space
+        stat = shutil.disk_usage(os.path.dirname(path))
+        available_gb = stat.free / (1024**3)
 
-    def save_checkpoint(self, path: str, epoch: int, optimizer: torch.optim.Optimizer, metrics: Dict):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+        if available_gb < 1.0:  # Less than 1GB available
+            print(f"⚠️  WARNING: Low disk space ({available_gb:.2f} GB available)")
+            print(f"⚠️  Skipping checkpoint save to avoid disk full error")
+            return
 
         checkpoint = {
             'epoch': epoch,
             'model_state_dict': self.model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
-            'metrics': metrics,
-            'train_components': self.train_components,
-            'freeze_components': self.freeze_components,
+            'train_loss': metrics['train']['total_loss'],
+            'val_loss': metrics['val']['total_loss'],
+            'metrics': metrics
         }
 
-        torch.save(checkpoint, path)
-        print(f"Checkpoint saved: {path}")
+        try:
+            # Create directory if it doesn't exist
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+
+            # Save checkpoint
+            torch.save(checkpoint, path)
+            print(f"✅ Checkpoint saved: {path} ({available_gb:.2f} GB remaining)")
+        except RuntimeError as e:
+            if "file write failed" in str(e) or "PytorchStreamWriter failed" in str(e):
+                print(f"❌ ERROR: Failed to save checkpoint - disk may be full")
+                print(f"   Available space: {available_gb:.2f} GB")
+                print(f"   Try using --checkpoint_dir to specify a different location")
+            else:
+                raise e
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='FocalCodec Direct Fine-tuning')
-
-    # Dataset parameters
-    parser.add_argument('--batch_size', type=int, default=32)
+    parser = argparse.ArgumentParser(description='Train FocalCodec with Whisper ASR Loss')
+    
+    # Data parameters
+    parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--chunk_duration', type=float, default=3.0)
     parser.add_argument('--overlap', type=float, default=0.5)
@@ -463,9 +740,12 @@ def parse_args():
     parser.add_argument('--use_feature_loss', action='store_true')
     parser.add_argument('--use_time_loss', action='store_true')
     parser.add_argument('--use_mel_loss', action='store_true')
+    parser.add_argument('--use_asr_loss', action='store_true', help='Enable Whisper ASR loss')
     parser.add_argument('--weight_feature', type=float, default=1.0)
     parser.add_argument('--weight_time', type=float, default=0.3)
     parser.add_argument('--weight_mel', type=float, default=0.3)
+    parser.add_argument('--weight_asr', type=float, default=0.5, help='Weight for ASR loss')
+    parser.add_argument('--asr_cache_dir', type=str, default='/mnt/Internal/jieshiang/Model/ASR')
 
     # Other parameters
     parser.add_argument('--gpu_id', type=int, default=0)
@@ -473,9 +753,9 @@ def parse_args():
     parser.add_argument('--resume', type=str, default=None, help='Resume from checkpoint')
 
     # Early stopping
-    parser.add_argument('--early_stopping', action='store_true', help='Enable early stopping')
-    parser.add_argument('--patience', type=int, default=5, help='Early stopping patience (epochs)')
-    parser.add_argument('--min_delta', type=float, default=1e-4, help='Minimum change to qualify as improvement')
+    parser.add_argument('--early_stopping', action='store_true')
+    parser.add_argument('--patience', type=int, default=5)
+    parser.add_argument('--min_delta', type=float, default=1e-4)
 
     return parser.parse_args()
 
@@ -488,12 +768,10 @@ def main():
 
     if not any([args.train_encoder, args.train_compressor, args.train_decompressor, args.train_decoder]):
         print("ERROR: At least one component must be trained!")
-        print("Use --train_encoder, --train_compressor, --train_decompressor, or --train_decoder")
         return
 
-    if not any([args.use_feature_loss, args.use_time_loss, args.use_mel_loss]):
+    if not any([args.use_feature_loss, args.use_time_loss, args.use_mel_loss, args.use_asr_loss]):
         print("ERROR: At least one loss must be enabled!")
-        print("Use --use_feature_loss, --use_time_loss, or --use_mel_loss")
         return
 
     print(f"\nLoading model: {MODEL_CONFIG}")
@@ -531,10 +809,14 @@ def main():
         'use_feature': args.use_feature_loss,
         'use_time': args.use_time_loss,
         'use_mel': args.use_mel_loss,
+        'use_asr': args.use_asr_loss,
         'weight_feature': args.weight_feature,
         'weight_time': args.weight_time,
         'weight_mel': args.weight_mel,
-        'sample_rate': 16000
+        'weight_asr': args.weight_asr,
+        'sample_rate': 16000,
+        'device': device,
+        'asr_cache_dir': args.asr_cache_dir
     }
 
     trainer = FocalCodecTrainer(
@@ -547,6 +829,7 @@ def main():
     )
 
     print("\nPreparing datasets...")
+    
     train_dataset = AudioDataset(
         csv_path=TRAIN_CSV,
         sample_rate=16000,
@@ -607,7 +890,6 @@ def main():
         print(f"{'='*60}")
 
         train_metrics = trainer.train_epoch(train_loader, optimizer, epoch)
-
         val_metrics = trainer.validate(val_loader)
 
         print(f"\nTrain metrics:")
@@ -639,21 +921,12 @@ def main():
             print(f"⚠️  No improvement for {patience_counter} epoch(s) (best: {best_val_loss:.6f} at epoch {best_epoch})")
 
             if args.early_stopping and patience_counter >= args.patience:
-                print(f"\n{'='*60}")
-                print(f"Early stopping triggered!")
-                print(f"{'='*60}")
+                print(f"\nEarly stopping triggered!")
                 print(f"Best validation loss: {best_val_loss:.6f} (epoch {best_epoch})")
-                print(f"No improvement for {patience_counter} consecutive epochs")
                 break
 
-    print("\n" + "="*60)
-    print("Training completed!")
-    print("="*60)
+    print("\nTraining completed!")
     print(f"Best model: epoch {best_epoch} with val_loss {best_val_loss:.6f}")
-    if args.early_stopping and patience_counter >= args.patience:
-        print(f"Training stopped early at epoch {epoch}/{args.num_epochs}")
-    else:
-        print(f"Completed all {args.num_epochs} epochs")
 
 
 if __name__ == '__main__':
