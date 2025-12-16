@@ -28,7 +28,8 @@ from focalcodec import FocalCodec
 
 
 TRAIN_CSV = '/home/jieshiang/Desktop/GitHub/FocalCodec/experiments/data_commonvoice/train_split.csv'
-VAL_CSV = '/home/jieshiang/Desktop/GitHub/FocalCodec/experiments/data_commonvoice/val_split.csv'
+# OVERFITTING TEST: Use same data for train and val to test if model CAN learn
+VAL_CSV = '/home/jieshiang/Desktop/GitHub/FocalCodec/experiments/data_commonvoice/train_split.csv'  # Same as TRAIN_CSV!
 MODEL_CONFIG = "lucadellalib/focalcodec_50hz_2k_causal"
 MODEL_CACHE_DIR = "/mnt/Internal/jieshiang/Model/FocalCodec"
 DEFAULT_CHECKPOINT_DIR = '/mnt/Internal/jieshiang/Model/FocalCodec/checkpoints_focalcodec'
@@ -58,8 +59,8 @@ class AudioDataset(Dataset):
             self.augmentation = nn.Sequential()
 
         df = pd.read_csv(csv_path)
-        
-        # 確認 CSV 有 transcription 欄位
+
+        # Verify CSV has transcription column
         if 'transcription' not in df.columns:
             raise ValueError(f"CSV must have 'transcription' column! Found: {df.columns.tolist()}")
 
@@ -168,8 +169,8 @@ class WhisperASRLoss(nn.Module):
         """Load Whisper-tiny model"""
         try:
             import whisper
-            
-            # 設定下載目錄
+
+            # Set download directory
             whisper_cache = os.path.join(self.cache_dir, "whisper")
             os.makedirs(whisper_cache, exist_ok=True)
             
@@ -180,8 +181,8 @@ class WhisperASRLoss(nn.Module):
                 device=self.device,
                 download_root=whisper_cache
             )
-            
-            # 獲取 tokenizer
+
+            # Get tokenizer
             self.tokenizer = whisper.tokenizer.get_tokenizer(
                 multilingual=self.whisper_model.is_multilingual
             )
@@ -194,11 +195,11 @@ class WhisperASRLoss(nn.Module):
     @torch.no_grad()
     def encode_text_to_tokens(self, texts: List[str]) -> Tuple[torch.Tensor, torch.Tensor]:
         """
-        將文字編碼為 token IDs
-        
+        Encode text to token IDs
+
         Returns:
             tokens: [batch_size, max_len] token IDs
-            lengths: [batch_size] 每個序列的有效長度
+            lengths: [batch_size] valid length of each sequence
         """
         import whisper
         
@@ -207,7 +208,7 @@ class WhisperASRLoss(nn.Module):
         
         for text in texts:
             # Whisper tokenization
-            # 加入 SOT (start of transcript) token
+            # Add SOT (start of transcript) token
             tokens = [self.tokenizer.sot]
             tokens += self.tokenizer.encode(text)
             tokens.append(self.tokenizer.eot)  # EOT (end of transcript)
@@ -231,7 +232,7 @@ class WhisperASRLoss(nn.Module):
     @torch.no_grad()
     def get_whisper_encoder_output(self, audio: torch.Tensor) -> torch.Tensor:
         """
-        獲取 Whisper encoder 的輸出
+        Get Whisper encoder output
 
         Args:
             audio: [batch_size, samples]
@@ -257,7 +258,7 @@ class WhisperASRLoss(nn.Module):
                 # Trim to 30 seconds
                 audio_np = audio_np[:target_length]
 
-            # 獲取 mel spectrogram
+            # Get mel spectrogram
             mel = whisper.log_mel_spectrogram(audio_np).to(self.device)
 
             # Encoder forward
@@ -273,49 +274,49 @@ class WhisperASRLoss(nn.Module):
         ground_truth_texts: List[str]
     ) -> Tuple[torch.Tensor, Dict[str, float]]:
         """
-        計算 ASR Cross Entropy Loss
-        
+        Compute ASR Cross Entropy Loss
+
         Args:
-            original_audio: [batch_size, samples] - 不使用,但保留介面一致性
-            reconstructed_audio: [batch_size, samples] - 重建的音訊
-            ground_truth_texts: List[str] - Ground truth 文字
-        
+            original_audio: [batch_size, samples] - unused, kept for interface consistency
+            reconstructed_audio: [batch_size, samples] - reconstructed audio
+            ground_truth_texts: List[str] - ground truth text
+
         Returns:
             loss: ASR cross entropy loss
             info: Loss information dictionary
         """
-        
+
         if not ground_truth_texts or all(t == "" for t in ground_truth_texts):
-            # 如果沒有 ground truth,返回零 loss
+            # If no ground truth, return zero loss
             return torch.tensor(0.0, device=self.device), {'asr_loss': 0.0}
-        
+
         batch_size = reconstructed_audio.shape[0]
-        
-        # 1. 將 ground truth 文字編碼為 tokens
+
+        # 1. Encode ground truth text to tokens
         gt_tokens, gt_lengths = self.encode_text_to_tokens(ground_truth_texts)
         # gt_tokens: [batch_size, max_len]
-        
-        # 2. 獲取重建音訊的 encoder output
+
+        # 2. Get encoder output from reconstructed audio
         encoder_output = self.get_whisper_encoder_output(reconstructed_audio)
         # encoder_output: [batch_size, n_audio_frames, n_embed]
-        
-        # 3. Decoder forward pass 獲取 logits
-        # Whisper decoder 是 autoregressive,需要逐步 decode
+
+        # 3. Decoder forward pass to get logits
+        # Whisper decoder is autoregressive, decode step by step
         total_loss = 0.0
         total_tokens = 0
-        
+
         for i in range(batch_size):
-            # 當前樣本的 encoder output
+            # Current sample's encoder output
             enc_out = encoder_output[i:i+1]  # [1, n_frames, n_embed]
-            
-            # Ground truth tokens (包含 SOT 和 EOT)
+
+            # Ground truth tokens (includes SOT and EOT)
             tokens = gt_tokens[i]  # [max_len]
             length = gt_lengths[i].item()
-            
-            # 使用 teacher forcing: input = tokens[:-1], target = tokens[1:]
-            # 即: 用前 N-1 個 token 預測第 N 個 token
+
+            # Use teacher forcing: input = tokens[:-1], target = tokens[1:]
+            # i.e., use first N-1 tokens to predict Nth token
             input_tokens = tokens[:-1].unsqueeze(0)  # [1, seq_len-1]
-            target_tokens = tokens[1:length]  # [seq_len-1] (去掉最後的 padding)
+            target_tokens = tokens[1:length]  # [seq_len-1] (remove trailing padding)
             
             if len(target_tokens) == 0:
                 continue
@@ -323,8 +324,8 @@ class WhisperASRLoss(nn.Module):
             # Decoder forward
             logits = self.whisper_model.decoder(input_tokens, enc_out)
             # logits: [1, seq_len-1, vocab_size]
-            
-            # 計算 cross entropy
+
+            # Compute cross entropy
             logits = logits[0, :len(target_tokens), :]  # [seq_len-1, vocab_size]
             
             # Cross entropy loss
@@ -385,7 +386,7 @@ class FlexibleLossWithASR(nn.Module):
                 n_fft=1024,
                 hop_length=256,
                 n_mels=80
-            ).to(device)  # 移到正確的 device
+            ).to(device)  # Move to correct device
         
         if use_asr:
             self.asr_loss_module = WhisperASRLoss(

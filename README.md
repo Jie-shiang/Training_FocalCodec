@@ -51,13 +51,23 @@ pip install -r requirements.txt
 
 ## Path Configuration
 
-Important: Modify paths in the following files:
+**Important:** Modify hardcoded paths in the following files before running:
 
-| File | Lines | Content |
-|------|-------|---------|
-| train_focalcodec.py | 36-47 | Training dataset paths, model cache path |
-| run_full_pipeline.py | 237-243, 363-390 | Checkpoint path, inference output path, evaluation CSV path |
-| experiments_lora_tuning.sh | 24-27 | GPU ID, Conda environment, Codec_comparison path |
+| File | Lines | Content | Default Value |
+|------|-------|---------|---------------|
+| train_focalcodec.py | 30-36 | Training/validation CSV paths | `/home/jieshiang/Desktop/GitHub/FocalCodec/experiments/data_commonvoice/` |
+| train_focalcodec.py | 34 | Model cache directory | `/mnt/Internal/jieshiang/Model/FocalCodec` |
+| train_focalcodec.py | 35 | Default checkpoint directory | `/mnt/Internal/jieshiang/Model/FocalCodec/checkpoints_focalcodec` |
+| train_focalcodec.py | 36 | Log directory | `/mnt/Internal/jieshiang/Model/FocalCodec/logs` |
+| train_focalcodec.py | 73 | Base audio directory | `/mnt/Internal/ASR` |
+| run_full_pipeline.py | 145-149 | Checkpoint directory | `/mnt/Internal/jieshiang/Model/FocalCodec/checkpoints_{exp_name}` |
+| run_full_pipeline.py | 148 | Inference output directory | `/mnt/Internal/jieshiang/Inference_Result/FocalCodec-S/50Hz_2K_finetuned/{exp_name}` |
+| run_full_pipeline.py | 183, 255-262, 275-282 | Dataset CSV paths, model cache, base audio directory | Various paths under `/home/jieshiang/` and `/mnt/Internal/` |
+| experiments_lora_tuning.sh | 24, 27 | GPU ID, Conda environments | GPU 3, `focalcodec`, `codec_eval` |
+| experiments_lora_tuning.sh | 27 | Codec_comparison path | `/home/jieshiang/Desktop/GitHub/Codec_comparison` |
+| experiments_full_training.sh | 7-10 | GPU ID, Conda environments, Codec_comparison path | GPU 3, paths under `/home/jieshiang/` |
+| experiments_overfitting.sh | 9-10 | GPU ID, base directory | GPU 2, `/home/jieshiang/Desktop/GitHub/FocalCodec` |
+| simple_inference.py | 86 | Model cache directory (default) | `/mnt/Internal/jieshiang/Model/FocalCodec` |
 
 ## Prepare Dataset
 
@@ -169,13 +179,6 @@ experiments/bs32_lr1e-04_ep50_dec_feat+mel_lora16_YYYYMMDD_HHMMSS/
 └── librispeech_summary.csv         # English statistics summary
 ```
 
-Evaluation metrics:
-- UTMOS: Speech quality (higher is better)
-- PESQ: Perceptual quality (higher is better)
-- STOI: Intelligibility (higher is better)
-- Speaker_Sim: Speaker similarity (higher is better)
-- dWER: WER degradation (lower is better, LibriSpeech)
-- dCER: CER degradation (lower is better, CommonVoice)
 
 ## References
 

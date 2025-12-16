@@ -1,0 +1,33 @@
+# This list shows the Pip dependencies for a Python 3.9 environment.
+
+# It assumes that PyTorch, Torchaudio, Torchvision, and CUDA Toolkit are pre-installed via Conda.
+
+# --- ASR & Transformers ---
+transformers>=4.30.0
+accelerate>=0.20.0
+
+# --- Speech/Audio Quality Assessment Models (V1 & V2) ---
+nisqa # V2 MOS Quality (Confirmed to install 2.0.post2 with Python 3.9)
+wespeaker @ git+https://github.com/wenet-e2e/wespeaker.git@master # V2 Speaker Similarity (Installed using the correct Git source code)
+speechbrain>=0.5.15 # V1 Speaker Similarity (SpeechBrain/ECAPA-TDNN)
+modelscope # V2 Chinese Model (Paraformer, CAM++, RAMP)
+
+# --- Signal Quality and Processing --- pesq>=0.0.4
+pystoi>=0.3.3
+librosa>=0.10.0
+soundfile>=0.12.0
+
+# --- ASR Metrics ---
+jiwer>=3.0.0
+python-Levenshtein>=0.21.0
+
+# --- Chinese Text Processing ---
+opencc-python-reimplemented>=0.1.7
+cn2an>=0.5.22
+
+# --- Core Libraries and Tools for Data Science ---
+pandas>=1.5.0
+numpy>=1.23.0
+scipy>=1.10.0
+tqdm>=4.65.0
+PyYAML # Commonly Used Configuration Files

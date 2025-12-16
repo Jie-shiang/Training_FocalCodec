@@ -1,9 +1,9 @@
 #!/bin/bash
 ################################################################################
-# FocalCodec Full Fine-tuning 實驗腳本
+# FocalCodec Full Fine-tuning Experiment Script
 ################################################################################
 
-# 公用參數
+# Common parameters
 GPU_ID=3
 TRAIN_ENV="focalcodec"
 EVAL_ENV="codec_eval"
@@ -13,7 +13,7 @@ BATCH_SIZE=32
 OVERLAP=0.5
 PATIENCE=15
 
-# 基礎參數
+# Base parameters
 BASE_WEIGHT_FEATURE=1.0
 BASE_WEIGHT_TIME=0.3
 BASE_WEIGHT_MEL=0.3
@@ -22,11 +22,11 @@ BASE_GRADIENT_CLIP=1.0
 BASE_WEIGHT_DECAY=1e-5
 
 ################################################################################
-# 實驗 1: 只訓練 Decoder
+# Experiment 1: Train Decoder Only
 ################################################################################
 
 echo "=========================================="
-echo "實驗 1a: Full Training - Decoder Only - LR 1e-5"
+echo "Experiment 1a: Full Training - Decoder Only - LR 1e-5"
 echo "=========================================="
 
 python run_full_pipeline.py \
@@ -61,7 +61,7 @@ python run_full_pipeline.py \
 sleep 5
 
 echo "=========================================="
-echo "實驗 1b: Full Training - Decoder Only - LR 1e-6"
+echo "Experiment 1b: Full Training - Decoder Only - LR 1e-6"
 echo "=========================================="
 
 python run_full_pipeline.py \
@@ -96,11 +96,11 @@ python run_full_pipeline.py \
 sleep 5
 
 ################################################################################
-# 實驗 2: 訓練 Decoder + Decompressor
+# Experiment 2: Train Decoder + Decompressor
 ################################################################################
 
 echo "=========================================="
-echo "實驗 2a: Full Training - Decoder + Decompressor - LR 1e-5"
+echo "Experiment 2a: Full Training - Decoder + Decompressor - LR 1e-5"
 echo "=========================================="
 
 python run_full_pipeline.py \
@@ -135,7 +135,7 @@ python run_full_pipeline.py \
 sleep 5
 
 echo "=========================================="
-echo "實驗 2b: Full Training - Decoder + Decompressor - LR 1e-6"
+echo "Experiment 2b: Full Training - Decoder + Decompressor - LR 1e-6"
 echo "=========================================="
 
 python run_full_pipeline.py \

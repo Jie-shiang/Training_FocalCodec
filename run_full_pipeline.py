@@ -15,7 +15,7 @@ def run_command(cmd, description, conda_env=None, log_file=None):
     """Execute shell command with optional logging"""
     print(f"\n{'='*80}\n {description}\n{'='*80}")
     if conda_env:
-        # 使用 bash -c 來正確處理 cd && python 的組合命令
+        # Use bash -c to properly handle cd && python combined commands
         cmd = f"conda run -n {conda_env} bash -c '{cmd}'"
     print(f"Command: {cmd}\n")
 
@@ -263,8 +263,8 @@ def main():
     )
     run_command(inf_cmd_cv, "Inference CommonVoice", args.train_env, log_file=logs_dir / "inference_commonvoice.log")
 
-    # 推論腳本會創建嵌套目錄結構: cv_dir/FocalCodec-S/50HZ/2K_finetuned/commonvoice/
-    # 找到實際的音頻文件目錄
+    # Inference script creates nested directory structure: cv_dir/FocalCodec-S/50HZ/2K_finetuned/commonvoice/
+    # Find actual audio file directory
     cv_audio_dir = cv_dir / "FocalCodec-S" / "50HZ" / "2K_finetuned" / "commonvoice"
     
     # Step 3: Inference LibriSpeech
@@ -283,8 +283,8 @@ def main():
     )
     run_command(inf_cmd_ls, "Inference LibriSpeech", args.train_env, log_file=logs_dir / "inference_librispeech.log")
 
-    # 推論腳本會創建嵌套目錄結構: ls_dir/FocalCodec-S/50HZ/2K_finetuned/librispeech/
-    # 找到實際的音頻文件目錄
+    # Inference script creates nested directory structure: ls_dir/FocalCodec-S/50HZ/2K_finetuned/librispeech/
+    # Find actual audio file directory
     ls_audio_dir = ls_dir / "FocalCodec-S" / "50HZ" / "2K_finetuned" / "librispeech"
     
     # Step 4: Evaluation config
@@ -374,7 +374,7 @@ def main():
             'num_epochs': args.num_epochs,
         }
 
-        # fast_evaluation_pipeline.py 的輸出格式
+        # Output format from fast_evaluation_pipeline.py
         cv_summary = result_dir / "summary_results_FocalCodec-S_50Hz_2k_finetuned_clean_commonvoice.csv"
         ls_summary = result_dir / "summary_results_FocalCodec-S_50Hz_2k_finetuned_clean_librispeech.csv"
 
