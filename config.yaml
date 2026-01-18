@@ -1,0 +1,155 @@
+# =============================================================================
+# FocalCodec 25Hz 2048 Training Configuration
+# =============================================================================
+# All paths and parameters are configured here.
+# Scripts read from this file - modify here instead of editing scripts.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Paths Configuration
+# -----------------------------------------------------------------------------
+paths:
+  # Project base directory
+  base_dir: "/home/jieshiang/Desktop/GitHub/FocalCodec_main"
+
+  # FocalCodec source code (cloned from github)
+  focalcodec_dir: "/home/jieshiang/Desktop/GitHub/FocalCodec_main/focalcodec"
+
+  # Pretrained model cache directory
+  model_cache_dir: "/mnt/Internal/jieshiang/Model/FocalCodec"
+
+  # ASR model cache directory (for Whisper)
+  asr_cache_dir: "/mnt/Internal/jieshiang/Model/ASR"
+
+  # Training output directory
+  output_dir: "/mnt/Internal/jieshiang/Model/FocalCodec/25hz_2048"
+
+  # Inference output directory
+  inference_dir: "/mnt/Internal/jieshiang/Inference_Result/FocalCodec-S/25hz_2048"
+
+# -----------------------------------------------------------------------------
+# Data Configuration
+# -----------------------------------------------------------------------------
+data:
+  # Base path for audio files (CSV contains relative paths from here)
+  audio_base_path: "/mnt/Internal/ASR"
+
+  # Training CSV file
+  train_csv: "${paths.base_dir}/experiments/data_aishell/train_split.csv"
+
+  # Validation CSV file
+  val_csv: "${paths.base_dir}/experiments/data_aishell/val_split.csv"
+
+# -----------------------------------------------------------------------------
+# Model Configuration
+# -----------------------------------------------------------------------------
+model:
+  # Base model from Hugging Face (50Hz causal)
+  base_model: "lucadellalib/focalcodec_50hz_2k_causal"
+
+  # Teacher model from Hugging Face (25Hz non-causal)
+  teacher_model: "lucadellalib/focalcodec_25hz"
+
+  # Codebook size (2048 = 11-bit, 256 = 8-bit)
+  codebook_size: 2048
+
+  # Frame rate after compression (Hz)
+  frame_rate: 25
+
+  # Calculated: bitrate = frame_rate * log2(codebook_size)
+  # 25 * 11 = 275 bps
+
+# -----------------------------------------------------------------------------
+# Training Configuration
+# -----------------------------------------------------------------------------
+training:
+  # Current training stage (1, 2, or 3)
+  stage: 1
+
+  # GPU ID to use
+  gpu_id: 1
+
+  # Batch size (reduce if OOM)
+  batch_size: 250
+
+  # Number of data loader workers
+  num_workers: 16
+
+  # Total epochs
+  num_epochs: 500
+
+  # Learning rate
+  learning_rate: 0.0005
+
+  # Weight decay for AdamW
+  weight_decay: 0.01
+
+  # Gradient clipping value
+  gradient_clip: 5.0
+
+  # Audio chunk duration (seconds)
+  chunk_duration: 3.0
+
+  # Chunk overlap ratio (0.0 - 1.0)
+  overlap: 0.5
+
+  # Early stopping patience (epochs)
+  patience: 25
+
+  # Minimum improvement for early stopping
+  min_delta: 0.00001
+
+# -----------------------------------------------------------------------------
+# Loss Weights Configuration
+# -----------------------------------------------------------------------------
+loss:
+  # Stage 1: Feature matching loss weight
+  weight_feature: 1.0
+
+  # Stage 2/3: ASR loss weight
+  weight_asr: 1.0
+
+  # Stage 3: HuBERT loss weight
+  weight_hubert: 0.5
+
+# -----------------------------------------------------------------------------
+# Inference Configuration
+# -----------------------------------------------------------------------------
+inference:
+  # GPU ID for inference
+  gpu_id: 1
+
+  # Maximum samples to process
+  max_samples: 2000
+
+  # Checkpoint to use (relative to output_dir/stage_X/)
+  checkpoint: "best_model.pt"
+
+# -----------------------------------------------------------------------------
+# Evaluation Configuration
+# -----------------------------------------------------------------------------
+evaluation:
+  # GPU ID for evaluation
+  gpu_id: 1
+
+  # Maximum samples to evaluate
+  max_samples: 2000
+
+  # ASR model for dCER evaluation
+  asr_model: "openai/whisper-small"
+
+# -----------------------------------------------------------------------------
+# Continue Training Configuration
+# -----------------------------------------------------------------------------
+continue_training:
+  # GPU ID for continue training
+  gpu_id: 2
+
+  # Extended epochs for continue training
+  num_epochs: 1000
+
+  # Extended patience for continue training
+  patience: 50
+
+  # Checkpoint to resume from (relative to output_dir/stage_X/)
+  resume_checkpoint: "last_model.pt"

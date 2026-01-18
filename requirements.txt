@@ -1,33 +1,27 @@
-# This list shows the Pip dependencies for a Python 3.9 environment.
+# FocalCodec 25Hz 2048 Training Requirements
+# Python 3.9+ recommended
 
-# It assumes that PyTorch, Torchaudio, Torchvision, and CUDA Toolkit are pre-installed via Conda.
+# Core
+torch>=2.0.0
+torchaudio>=2.0.0
+numpy>=1.21.0
+pandas>=1.3.0
+tqdm>=4.62.0
 
-# --- ASR & Transformers ---
+# Hugging Face
+huggingface-hub>=0.16.0
+safetensors>=0.3.0
 transformers>=4.30.0
-accelerate>=0.20.0
 
-# --- Speech/Audio Quality Assessment Models (V1 & V2) ---
-nisqa # V2 MOS Quality (Confirmed to install 2.0.post2 with Python 3.9)
-wespeaker @ git+https://github.com/wenet-e2e/wespeaker.git@master # V2 Speaker Similarity (Installed using the correct Git source code)
-speechbrain>=0.5.15 # V1 Speaker Similarity (SpeechBrain/ECAPA-TDNN)
-modelscope # V2 Chinese Model (Paraformer, CAM++, RAMP)
-
-# --- Signal Quality and Processing --- pesq>=0.0.4
-pystoi>=0.3.3
-librosa>=0.10.0
+# Audio Processing
 soundfile>=0.12.0
+librosa>=0.10.0
 
-# --- ASR Metrics ---
-jiwer>=3.0.0
-python-Levenshtein>=0.21.0
+# ASR for Evaluation
+openai-whisper>=20231117
 
-# --- Chinese Text Processing ---
-opencc-python-reimplemented>=0.1.7
-cn2an>=0.5.22
+# Metrics
+Levenshtein>=0.21.0
 
-# --- Core Libraries and Tools for Data Science ---
-pandas>=1.5.0
-numpy>=1.23.0
-scipy>=1.10.0
-tqdm>=4.65.0
-PyYAML # Commonly Used Configuration Files
+# Optional: Stage 2/3 Training
+# speechbrain>=0.5.0  # For HuBERT
