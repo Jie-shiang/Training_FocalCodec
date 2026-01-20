@@ -1,16 +1,36 @@
 #!/bin/bash
 ################################################################################
-# FocalCodec 25Hz Inference
-#
-# Reads configuration from config.yaml
+# Inference Script for Two-Stage FocalCodec
 #
 # Usage:
-#   bash infer.sh                    # Inference with config.yaml settings
-#   bash infer.sh --stage 2          # Override stage
-#   bash infer.sh --max_samples 500  # Override max samples
+#   bash infer.sh 1          # Inference with Stage 1 (50Hz)
+#   bash infer.sh 2          # Inference with Stage 2 (25Hz)
+#   bash infer.sh 2 500      # Inference Stage 2 with max 500 samples
 ################################################################################
 
 set -e
+
+# Check arguments
+if [ $# -lt 1 ]; then
+    echo "Usage: bash infer.sh <stage> [max_samples]"
+    echo "  stage: 1 (50Hz) or 2 (25Hz)"
+    echo "  max_samples: optional, default from config.yaml"
+    echo ""
+    echo "Examples:"
+    echo "  bash infer.sh 1          # Inference with Stage 1"
+    echo "  bash infer.sh 2          # Inference with Stage 2"
+    echo "  bash infer.sh 2 500      # Stage 2, max 500 samples"
+    exit 1
+fi
+
+STAGE=$1
+MAX_SAMPLES=${2:-""}
+
+# Validate stage
+if [ "$STAGE" != "1" ] && [ "$STAGE" != "2" ]; then
+    echo "ERROR: Stage must be 1 or 2"
+    exit 1
+fi
 
 # Environment
 export TOKENIZERS_PARALLELISM=false
@@ -21,7 +41,7 @@ conda activate focalcodec
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# Parse config using Python
+# Parse config
 get_config() {
     python -c "
 import yaml
@@ -35,34 +55,35 @@ print(value if value else '')
 "
 }
 
-# Load config values
-GPU_ID=$(get_config "inference.gpu_id")
-STAGE=$(get_config "training.stage")
-CODEBOOK_SIZE=$(get_config "model.codebook_size")
-FRAME_RATE=$(get_config "model.frame_rate")
-MAX_SAMPLES=$(get_config "inference.max_samples")
-
-# Calculate bitrate
-BITS=$(python3 -c "import math; print(int(math.log2(${CODEBOOK_SIZE})))")
-BITRATE=$((FRAME_RATE * BITS))
+STAGE_KEY="stage${STAGE}"
+GPU_ID=$(get_config "${STAGE_KEY}.gpu_id")
+FRAME_RATE=$([ "$STAGE" = "1" ] && echo "50" || echo "25")
+OUTPUT_DIR=$(get_config "paths.output_dir")
+INFERENCE_DIR=$(get_config "paths.inference_dir")
 
 echo "========================================================================"
-echo "   FocalCodec 25Hz Inference"
+echo "   Inference: Stage ${STAGE} (${FRAME_RATE}Hz)"
 echo "========================================================================"
 echo ""
-echo "Configuration (from config.yaml):"
-echo "  Stage: ${STAGE}"
-echo "  Frame Rate: ${FRAME_RATE} Hz"
-echo "  Codebook: ${CODEBOOK_SIZE} (${BITS}-bit)"
-echo "  Bitrate: ${BITRATE} bps"
-echo "  Max Samples: ${MAX_SAMPLES}"
+echo "Configuration:"
 echo "  GPU: ${GPU_ID}"
+echo "  Frame Rate: ${FRAME_RATE} Hz"
+echo "  Stage: ${STAGE}"
+if [ -n "$MAX_SAMPLES" ]; then
+    echo "  Max Samples: ${MAX_SAMPLES}"
+fi
 echo ""
 echo "========================================================================"
 echo ""
+
+# Build command
+CMD="CUDA_VISIBLE_DEVICES=${GPU_ID} python infer_two_stage.py --stage ${STAGE}"
+if [ -n "$MAX_SAMPLES" ]; then
+    CMD="${CMD} --max_samples ${MAX_SAMPLES}"
+fi
 
 # Run inference
-CUDA_VISIBLE_DEVICES=$GPU_ID python infer_25hz_focalcodec.py "$@"
+eval $CMD
 
 if [ $? -eq 0 ]; then
     echo ""
@@ -70,7 +91,10 @@ if [ $? -eq 0 ]; then
     echo "   Inference Completed!"
     echo "========================================================================"
     echo ""
-    echo "Next step: Evaluate with bash eval.sh"
+    echo "Results saved to: ${INFERENCE_DIR}/stage${STAGE}/"
+    echo ""
+    echo "Next step: Run evaluation"
+    echo "  bash eval.sh ${STAGE}"
     echo "========================================================================"
 else
     echo ""

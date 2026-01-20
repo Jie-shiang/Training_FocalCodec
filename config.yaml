@@ -1,8 +1,8 @@
 # =============================================================================
-# FocalCodec 25Hz 2048 Training Configuration
+# FocalCodec Two-Stage Training Configuration
 # =============================================================================
-# All paths and parameters are configured here.
-# Scripts read from this file - modify here instead of editing scripts.
+# Stage 1: Fine-tune 50Hz Causal 2k on AISHELL
+# Stage 2: Add 4th layer for 25Hz downscale
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -10,10 +10,10 @@
 # -----------------------------------------------------------------------------
 paths:
   # Project base directory
-  base_dir: "/home/jieshiang/Desktop/GitHub/FocalCodec_main"
+  base_dir: "/home/jieshiang/Desktop/GitHub/FocalCodec"
 
   # FocalCodec source code (cloned from github)
-  focalcodec_dir: "/home/jieshiang/Desktop/GitHub/FocalCodec_main/focalcodec"
+  focalcodec_dir: "/home/jieshiang/Desktop/GitHub/FocalCodec/focalcodec"
 
   # Pretrained model cache directory
   model_cache_dir: "/mnt/Internal/jieshiang/Model/FocalCodec"
@@ -22,10 +22,10 @@ paths:
   asr_cache_dir: "/mnt/Internal/jieshiang/Model/ASR"
 
   # Training output directory
-  output_dir: "/mnt/Internal/jieshiang/Model/FocalCodec/25hz_2048"
+  output_dir: "/mnt/Internal/jieshiang/Model/FocalCodec/two_stage"
 
   # Inference output directory
-  inference_dir: "/mnt/Internal/jieshiang/Inference_Result/FocalCodec-S/25hz_2048"
+  inference_dir: "/mnt/Internal/jieshiang/Inference_Result/FocalCodec-S/two_stage"
 
 # -----------------------------------------------------------------------------
 # Data Configuration
@@ -50,67 +50,130 @@ model:
   # Teacher model from Hugging Face (25Hz non-causal)
   teacher_model: "lucadellalib/focalcodec_25hz"
 
-  # Codebook size (2048 = 11-bit, 256 = 8-bit)
+  # Codebook size (2048 = 11-bit)
   codebook_size: 2048
 
-  # Frame rate after compression (Hz)
-  frame_rate: 25
-
-  # Calculated: bitrate = frame_rate * log2(codebook_size)
-  # 25 * 11 = 275 bps
-
 # -----------------------------------------------------------------------------
-# Training Configuration
+# Stage 1: Fine-tune 50Hz on AISHELL (官方 SpeechBrain Recipe)
 # -----------------------------------------------------------------------------
-training:
-  # Current training stage (1, 2, or 3)
-  stage: 1
+# 訓練策略:
+#   - 訓練: Compressor + Decompressor
+#   - 凍結: Encoder + Decoder
+#   - Feature Loss: MSE(qfeats, feats) = MSE(decompressor_output, encoder_features)
+# -----------------------------------------------------------------------------
+stage1:
+  # Frame rate
+  frame_rate: 50
 
-  # GPU ID to use
+  # GPU ID
   gpu_id: 1
 
-  # Batch size (reduce if OOM)
-  batch_size: 250
+  # Batch size (官方: 16, 可依據 GPU 記憶體調整)
+  batch_size: 128
 
-  # Number of data loader workers
-  num_workers: 16
+  # Number of workers
+  num_workers: 4
 
-  # Total epochs
-  num_epochs: 500
+  # Total epochs (官方: 100)
+  num_epochs: 1000
 
-  # Learning rate
+  # Learning rate (官方: 0.0005 - 比一般 fine-tuning 高 50 倍!)
   learning_rate: 0.0005
 
-  # Weight decay for AdamW
+  # Weight decay (官方: 0.01)
   weight_decay: 0.01
 
-  # Gradient clipping value
+  # Gradient clipping
   gradient_clip: 5.0
 
   # Audio chunk duration (seconds)
   chunk_duration: 3.0
 
-  # Chunk overlap ratio (0.0 - 1.0)
+  # Chunk overlap ratio
   overlap: 0.5
 
-  # Early stopping patience (epochs)
-  patience: 25
+  # Early stopping patience
+  patience: 15
 
-  # Minimum improvement for early stopping
+  # Minimum improvement
   min_delta: 0.00001
 
-# -----------------------------------------------------------------------------
-# Loss Weights Configuration
-# -----------------------------------------------------------------------------
-loss:
-  # Stage 1: Feature matching loss weight
+  # Loss weights (官方方法只使用 feature loss)
   weight_feature: 1.0
+  weight_time: 0.0
+  weight_mel: 0.0
+  use_mel_loss: false
 
-  # Stage 2/3: ASR loss weight
-  weight_asr: 1.0
+  # Codebook monitoring
+  enable_codebook_monitor: true
 
-  # Stage 3: HuBERT loss weight
-  weight_hubert: 0.5
+  # Max chunks (0 = use all data)
+  max_chunks: 0
+
+# -----------------------------------------------------------------------------
+# Stage 2: Add 4th layer for 25Hz (官方方法)
+# -----------------------------------------------------------------------------
+# 訓練策略:
+#   - 從 Stage 1 checkpoint 開始
+#   - 添加第 4 層 FocalNet 層
+#   - 訓練: Compressor + Decompressor
+#   - 凍結: Encoder + Decoder
+#   - Feature Loss: MSE(qfeats, feats)
+# -----------------------------------------------------------------------------
+stage2:
+  # Frame rate
+  frame_rate: 25
+
+  # GPU ID
+  gpu_id: 1
+
+  # Batch size
+  batch_size: 128
+
+  # Number of workers
+  num_workers: 4
+
+  # Total epochs
+  num_epochs: 1000
+
+  # Learning rate for new layers (第 4 層)
+  learning_rate_new: 0.0005
+
+  # Learning rate for old layers (Layers 0-2, 已 fine-tuned)
+  learning_rate_old: 0.00005  # 10x smaller
+
+  # Weight decay
+  weight_decay: 0.01
+
+  # Gradient clipping
+  gradient_clip: 5.0
+
+  # Audio chunk duration (seconds)
+  chunk_duration: 3.0
+
+  # Chunk overlap ratio
+  overlap: 0.5
+
+  # Early stopping patience
+  patience: 25
+
+  # Minimum improvement
+  min_delta: 0.00001
+
+  # Loss weights (官方方法只使用 feature loss)
+  weight_feature: 1.0
+  weight_time: 0.0
+  weight_mel: 0.0
+  use_mel_loss: false
+
+  # Codebook monitoring
+  enable_codebook_monitor: true
+
+  # Warmup epochs (只訓練新的第 4 層)
+  warmup_epochs: 10
+
+  # Max chunks (0 = use all data)
+  max_chunks: 0
 
 # -----------------------------------------------------------------------------
 # Inference Configuration
@@ -122,7 +185,7 @@ inference:
   # Maximum samples to process
   max_samples: 2000
 
-  # Checkpoint to use (relative to output_dir/stage_X/)
+  # Checkpoint to use
   checkpoint: "best_model.pt"
 
 # -----------------------------------------------------------------------------
@@ -137,19 +200,3 @@ evaluation:
 
   # ASR model for dCER evaluation
   asr_model: "openai/whisper-small"
-
-# -----------------------------------------------------------------------------
-# Continue Training Configuration
-# -----------------------------------------------------------------------------
-continue_training:
-  # GPU ID for continue training
-  gpu_id: 2
-
-  # Extended epochs for continue training
-  num_epochs: 1000
-
-  # Extended patience for continue training
-  patience: 50
-
-  # Checkpoint to resume from (relative to output_dir/stage_X/)
-  resume_checkpoint: "last_model.pt"

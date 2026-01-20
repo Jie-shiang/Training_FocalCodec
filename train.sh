@@ -1,79 +1,61 @@
 #!/bin/bash
 ################################################################################
-# FocalCodec 25Hz Training
+# FocalCodec Two-Stage Training
 #
-# Reads configuration from config.yaml
+# Stage 1 (50Hz):
+#   - 訓練: Decompressor only (推薦)
+#   - 凍結: Encoder + Compressor + Decoder
+#   - 這是原始 7% dCER 結果使用的訓練策略
+#
+# Stage 2 (25Hz):
+#   - 在 Stage 1 基礎上添加第 4 層 FocalNet
+#   - 訓練: 新增的第 4 層
+#   - 凍結: Encoder + 前 3 層 Compressor/Decompressor + Decoder
+#
+# Training Modes (Stage 1 only):
+#   decompressor_only (default): Only train Decompressor
+#   both: Train Compressor + Decompressor (no STE)
+#   both_ste: Train with STE (may damage Compressor)
 #
 # Usage:
-#   bash train.sh              # Train with config.yaml settings
-#   bash train.sh --stage 2    # Override stage
-#   bash train.sh --resume     # Continue from last checkpoint
+#   bash train.sh 1                    # Train Stage 1 (decompressor_only)
+#   bash train.sh 1 both_ste           # Train Stage 1 with STE
+#   bash train.sh 2                    # Train Stage 2 (requires Stage 1 done)
+#
+# Output:
+#   Stage 1: output_dir/stage1_50hz/
+#   Stage 2: output_dir/stage2_25hz/
 ################################################################################
 
 set -e
 
-# Environment
-export TOKENIZERS_PARALLELISM=false
-source /opt/conda/anaconda3/etc/profile.d/conda.sh
-conda activate focalcodec
+# Parse arguments
+STAGE=${1:-1}
+TRAIN_MODE=${2:-"decompressor_only"}
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
-
-# Parse config using Python
-get_config() {
-    python -c "
-import yaml
-with open('config.yaml', 'r') as f:
-    config = yaml.safe_load(f)
-keys = '$1'.split('.')
-value = config
-for k in keys:
-    value = value.get(k, {})
-print(value if value else '')
-"
-}
-
-# Load config values
-GPU_ID=$(get_config "training.gpu_id")
-STAGE=$(get_config "training.stage")
-CODEBOOK_SIZE=$(get_config "model.codebook_size")
-FRAME_RATE=$(get_config "model.frame_rate")
-
-# Calculate bitrate
-BITS=$(python3 -c "import math; print(int(math.log2(${CODEBOOK_SIZE})))")
-BITRATE=$((FRAME_RATE * BITS))
-
-echo "========================================================================"
-echo "   FocalCodec 25Hz Training"
-echo "========================================================================"
-echo ""
-echo "Configuration (from config.yaml):"
-echo "  Stage: ${STAGE}"
-echo "  Frame Rate: ${FRAME_RATE} Hz"
-echo "  Codebook: ${CODEBOOK_SIZE} (${BITS}-bit)"
-echo "  Bitrate: ${BITRATE} bps"
-echo "  GPU: ${GPU_ID}"
-echo ""
-echo "========================================================================"
-echo ""
-
-# Run training
-CUDA_VISIBLE_DEVICES=$GPU_ID python train_25hz_focalcodec.py "$@"
-
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "========================================================================"
-    echo "   Training Completed!"
-    echo "========================================================================"
-    echo ""
-    echo "Next steps:"
-    echo "  1. Run inference: bash infer.sh"
-    echo "  2. Evaluate: bash eval.sh"
-    echo "========================================================================"
-else
-    echo ""
-    echo "ERROR: Training failed!"
+# Validate stage
+if [ "$STAGE" != "1" ] && [ "$STAGE" != "2" ]; then
+    echo "ERROR: Invalid stage '$STAGE'"
+    echo "Usage: bash train.sh [1|2] [train_mode]"
+    echo "  Stage 1: 50Hz training"
+    echo "  Stage 2: 25Hz training"
     exit 1
+fi
+
+# Stage 1: Use train_stage1.sh
+if [ "$STAGE" = "1" ]; then
+    echo "Executing Stage 1 training..."
+    bash train_stage1.sh $TRAIN_MODE
+    exit $?
+fi
+
+# Stage 2: Use train_stage2.sh
+if [ "$STAGE" = "2" ]; then
+    # Validate train_mode not specified
+    if [ "$TRAIN_MODE" != "decompressor_only" ]; then
+        echo "WARNING: Stage 2 does not support train_mode, using default strategy"
+    fi
+    echo "Executing Stage 2 training..."
+    bash train_stage2.sh
+    exit $?
 fi
