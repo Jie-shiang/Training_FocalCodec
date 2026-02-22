@@ -2,7 +2,7 @@
 
 Fine-tuning [FocalCodec-S](https://github.com/lucadellalib/focalcodec) for bilingual (Chinese/English) semantic speech codec with Whisper ASR Loss supervision.
 
-> **Audio Demo:** [https://jie-shiang.github.io/FocalCodec_Release/demo/](https://jie-shiang.github.io/FocalCodec_Release/demo/)
+> **Audio Demo:** [https://jie-shiang.github.io/Training_FocalCodec/demo/](https://jie-shiang.github.io/Training_FocalCodec/demo/)
 
 ---
 
