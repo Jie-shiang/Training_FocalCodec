@@ -78,9 +78,10 @@
 
         /* info row inside table */
         tr.info-row td {
-            background: #f9f9f9;
-            border-left: 4px solid #764ba2;
-            text-align: left;
+            background: #f0ecfa;
+            border-top: 2px solid #764ba2;
+            border-bottom: 2px solid #764ba2;
+            text-align: center;
             padding: 10px 16px;
             font-size: 13px;
             color: #333;
@@ -416,6 +417,180 @@
                         </div></td>
                     </tr>
 
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ════════ PRETRAINED FOCALCODEC ════════ -->
+    <div class="model-section" id="demo-pretrained">
+        <div class="model-header">
+            Pretrained FocalCodec — Official Models (No Fine-tuning)
+            <p>FocalCodec (50Hz / 25Hz / 12.5Hz) &nbsp;&amp;&nbsp; FocalCodec-S causal (2k / 4k / 65k codebook)</p>
+        </div>
+
+        <!-- CN -->
+        <div class="dataset-section">
+            <div class="dataset-title">Chinese — AISHELL-1 Test Set</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-model">Model</th>
+                        <th class="col-framerate">Frame Rate</th>
+                        <th style="width:100px;">Codebook</th>
+                        <th style="width:90px;">Bitrate</th>
+                        <th style="width:80px;">Causal</th>
+                        <th style="width:120px;">Audio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="info-row">
+                        <td colspan="6">
+                            <strong>Sample:</strong> BAC009S0764W0121 &nbsp;|&nbsp;
+                            <strong>Speaker:</strong> S0764 &nbsp;|&nbsp;
+                            <strong>Duration:</strong> ~4.2s &nbsp;|&nbsp;
+                            <strong>Transcript:</strong> 甚至出现交易几乎停滞的情况
+                        </td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Original</strong><span>AISHELL-1 clean</span></td>
+                        <td>—</td><td>—</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/cn/original.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec 50Hz</strong><span>lucadellalib/focalcodec_50hz</span></td>
+                        <td>50Hz</td><td>1×8192</td><td>650 bps</td><td>❌</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_50hz.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec 25Hz</strong><span>lucadellalib/focalcodec_25hz</span></td>
+                        <td>25Hz</td><td>1×8192</td><td>325 bps</td><td>❌</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_25hz.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec 12.5Hz</strong><span>lucadellalib/focalcodec_12_5hz</span></td>
+                        <td>12.5Hz</td><td>1×8192</td><td>163 bps</td><td>❌</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_12_5hz.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec-S 2k causal</strong><span>lucadellalib/focalcodec_50hz_2k_causal</span></td>
+                        <td>50Hz</td><td>1×2048</td><td>550 bps</td><td>✅</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_2k.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec-S 4k causal</strong><span>lucadellalib/focalcodec_50hz_4k_causal</span></td>
+                        <td>50Hz</td><td>1×4096</td><td>600 bps</td><td>✅</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_4k.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec-S 65k causal</strong><span>lucadellalib/focalcodec_50hz_65k_causal</span></td>
+                        <td>50Hz</td><td>1×65536</td><td>800 bps</td><td>✅</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_65k.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- EN -->
+        <div class="dataset-section">
+            <div class="dataset-title">English — LibriSpeech test-clean</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-model">Model</th>
+                        <th class="col-framerate">Frame Rate</th>
+                        <th style="width:100px;">Codebook</th>
+                        <th style="width:90px;">Bitrate</th>
+                        <th style="width:80px;">Causal</th>
+                        <th style="width:120px;">Audio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="info-row">
+                        <td colspan="6">
+                            <strong>Sample:</strong> 1089-134691-0002 &nbsp;|&nbsp;
+                            <strong>Speaker:</strong> 1089 &nbsp;|&nbsp;
+                            <strong>Duration:</strong> ~11.6s &nbsp;|&nbsp;
+                            <strong>Transcript:</strong> "He was in a fevered state of mind, owing to the blight on his hopes of Thornfield..."
+                        </td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Original</strong><span>LibriSpeech test-clean</span></td>
+                        <td>—</td><td>—</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/en/original.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec 50Hz</strong><span>lucadellalib/focalcodec_50hz</span></td>
+                        <td>50Hz</td><td>1×8192</td><td>650 bps</td><td>❌</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_50hz.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec 25Hz</strong><span>lucadellalib/focalcodec_25hz</span></td>
+                        <td>25Hz</td><td>1×8192</td><td>325 bps</td><td>❌</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_25hz.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec 12.5Hz</strong><span>lucadellalib/focalcodec_12_5hz</span></td>
+                        <td>12.5Hz</td><td>1×8192</td><td>163 bps</td><td>❌</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_12_5hz.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec-S 2k causal</strong><span>lucadellalib/focalcodec_50hz_2k_causal</span></td>
+                        <td>50Hz</td><td>1×2048</td><td>550 bps</td><td>✅</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_2k.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec-S 4k causal</strong><span>lucadellalib/focalcodec_50hz_4k_causal</span></td>
+                        <td>50Hz</td><td>1×4096</td><td>600 bps</td><td>✅</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_4k.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>FocalCodec-S 65k causal</strong><span>lucadellalib/focalcodec_50hz_65k_causal</span></td>
+                        <td>50Hz</td><td>1×65536</td><td>800 bps</td><td>✅</td>
+                        <td><div class="audio-cell">
+                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_65k.wav')">▶ Play</button>
+                        </div></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
