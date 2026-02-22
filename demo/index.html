@@ -171,14 +171,11 @@
         <div class="model-header">
             Chinese Demo — AISHELL-1 Test Set
         </div>
-
         <div class="dataset-section">
             <table>
                 <thead>
                     <tr>
                         <th class="col-model">Model</th>
-                        <th class="col-training">Training Data</th>
-                        <th class="col-time">Time</th>
                         <th class="col-framerate">Frame Rate</th>
                         <th style="width:90px;">Bitrate</th>
                         <th style="width:80px;">dCER ↓</th>
@@ -187,9 +184,8 @@
                     </tr>
                 </thead>
                 <tbody>
-
                     <tr class="info-row">
-                        <td colspan="8">
+                        <td colspan="6">
                             <strong>Sample:</strong> BAC009S0764W0121 &nbsp;|&nbsp;
                             <strong>Speaker:</strong> S0764 &nbsp;|&nbsp;
                             <strong>Duration:</strong> ~4.2s &nbsp;|&nbsp;
@@ -198,101 +194,112 @@
                     </tr>
 
                     <tr class="row-ref">
-                        <td class="col-model"><strong>Original</strong><span>AISHELL-1 clean</span></td>
-                        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/original.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Original</strong></td>
+                        <td>—</td><td>—</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/original.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-ref">
-                        <td class="col-model"><strong>Pretrained FocalCodec-S</strong><span>no fine-tuning</span></td>
-                        <td>—</td><td>—</td><td>50Hz</td><td>550 bps</td><td>25.3%</td><td>2.78</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/pretrained.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Pretrained FocalCodec 50Hz</strong></td>
+                        <td>50Hz</td><td>650 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_50hz.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec 25Hz</strong></td>
+                        <td>25Hz</td><td>325 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_25hz.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec 12.5Hz</strong></td>
+                        <td>12.5Hz</td><td>163 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_12_5hz.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 2k</strong></td>
+                        <td>50Hz</td><td>550 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_2k.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 4k</strong></td>
+                        <td>50Hz</td><td>600 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_4k.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 65k</strong></td>
+                        <td>50Hz</td><td>800 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_65k.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec-S</strong></td>
+                        <td>50Hz</td><td>550 bps</td><td>25.3%</td><td>2.78</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/pretrained.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp D — Stage 2</strong><span>Overfitting test · loss 1:10:5</span></td>
-                        <td>AISHELL</td><td>—</td><td>25Hz</td><td>275 bps</td><td>7.7%</td><td>—</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_D_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp D — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>7.7%</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_D_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 1</strong><span>decompressor_only</span></td>
-                        <td>AISHELL</td><td>25h</td><td>50Hz</td><td>550 bps</td><td>6.17%</td><td>2.96</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage1.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp E — Stage 1</strong></td>
+                        <td>50Hz</td><td>550 bps</td><td>6.17%</td><td>2.96</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage1.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 2</strong><span>decompressor_only</span></td>
-                        <td>AISHELL</td><td>25h</td><td>25Hz</td><td>275 bps</td><td>13.3%</td><td>2.74</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp E — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>13.3%</td><td>2.74</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 3</strong><span>decompressor_only</span></td>
-                        <td>AISHELL</td><td>25h</td><td>12.5Hz</td><td>137.5 bps</td><td>43.6%</td><td>2.42</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage3.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp E — Stage 3</strong></td>
+                        <td>12.5Hz</td><td>137.5 bps</td><td>43.6%</td><td>2.42</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage3.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp F — Stage 2</strong><span>both_ste</span></td>
-                        <td>AISHELL</td><td>25h</td><td>25Hz</td><td>275 bps</td><td>14.5%</td><td>2.68</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_F_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp F — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>14.5%</td><td>2.68</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_F_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp G — Stage 2</strong><span></span></td>
-                        <td>Bilingual</td><td>50h (25h CN+EN)</td><td>25Hz</td><td>275 bps</td><td>17.4%</td><td>2.65</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_G_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp G — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>17.4%</td><td>2.65</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_G_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp H — Stage 2</strong><span></span></td>
-                        <td>Bilingual</td><td>100h (50h CN+EN)</td><td>25Hz</td><td>275 bps</td><td>16.4%</td><td>2.71</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_H_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp H — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>16.4%</td><td>2.71</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_H_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp I — Stage 2</strong><span>rebalanced loss</span></td>
-                        <td>Bilingual</td><td>100h</td><td>25Hz</td><td>275 bps</td><td>16.6%</td><td>2.95</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_I_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp I — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>16.6%</td><td>2.95</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_I_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-best">
-                        <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong><span>ASR Loss (λ=30)</span></td>
-                        <td>Bilingual</td><td>100h</td><td>25Hz</td><td>275 bps</td><td><strong>4.15%</strong></td><td>1.59</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_J_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td><strong>4.15%</strong></td><td>1.59</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_J_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-best">
-                        <td class="col-model"><strong>Exp K — Stage 3</strong><span>ASR Loss (λ=20)</span></td>
-                        <td>Bilingual</td><td>100h</td><td>12.5Hz</td><td>137.5 bps</td><td>16.0%</td><td>1.33</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_K_stage3.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp K — Stage 3</strong></td>
+                        <td>12.5Hz</td><td>137.5 bps</td><td>16.0%</td><td>1.33</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_K_stage3.wav')">▶ Play</button></div></td>
                     </tr>
-
                 </tbody>
             </table>
         </div>
@@ -303,14 +310,11 @@
         <div class="model-header">
             English Demo — LibriSpeech test-clean
         </div>
-
         <div class="dataset-section">
             <table>
                 <thead>
                     <tr>
                         <th class="col-model">Model</th>
-                        <th class="col-training">Training Data</th>
-                        <th class="col-time">Time</th>
                         <th class="col-framerate">Frame Rate</th>
                         <th style="width:90px;">Bitrate</th>
                         <th style="width:80px;">dWER ↓</th>
@@ -319,9 +323,8 @@
                     </tr>
                 </thead>
                 <tbody>
-
                     <tr class="info-row">
-                        <td colspan="8">
+                        <td colspan="6">
                             <strong>Sample:</strong> 1089-134691-0002 &nbsp;|&nbsp;
                             <strong>Speaker:</strong> 1089 &nbsp;|&nbsp;
                             <strong>Duration:</strong> ~11.6s &nbsp;|&nbsp;
@@ -330,266 +333,105 @@
                     </tr>
 
                     <tr class="row-ref">
-                        <td class="col-model"><strong>Original</strong><span>LibriSpeech test-clean</span></td>
-                        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/original.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Original</strong></td>
+                        <td>—</td><td>—</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/original.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-ref">
-                        <td class="col-model"><strong>Pretrained FocalCodec-S</strong><span>no fine-tuning</span></td>
-                        <td>—</td><td>—</td><td>50Hz</td><td>550 bps</td><td>1.64%</td><td>3.71</td>
-                        <td><div class="audio-cell">
-                            <span class="no-audio">Not available<br><small>(Chinese-only pretrained run)</small></span>
-                        </div></td>
+                        <td class="col-model"><strong>Pretrained FocalCodec 50Hz</strong></td>
+                        <td>50Hz</td><td>650 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_50hz.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec 25Hz</strong></td>
+                        <td>25Hz</td><td>325 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_25hz.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec 12.5Hz</strong></td>
+                        <td>12.5Hz</td><td>163 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_12_5hz.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 2k</strong></td>
+                        <td>50Hz</td><td>550 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_2k.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 4k</strong></td>
+                        <td>50Hz</td><td>600 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_4k.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 65k</strong></td>
+                        <td>50Hz</td><td>800 bps</td><td>—</td><td>—</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_65k.wav')">▶ Play</button></div></td>
+                    </tr>
+
+                    <tr class="row-ref">
+                        <td class="col-model"><strong>Pretrained FocalCodec-S</strong></td>
+                        <td>50Hz</td><td>550 bps</td><td>1.64%</td><td>3.71</td>
+                        <td><div class="audio-cell"><span class="no-audio">Not available</span></div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 1</strong><span>decompressor_only</span></td>
-                        <td>AISHELL</td><td>25h</td><td>50Hz</td><td>550 bps</td><td>3.87%</td><td>3.32</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage1.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp E — Stage 1</strong></td>
+                        <td>50Hz</td><td>550 bps</td><td>3.87%</td><td>3.32</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage1.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 2</strong><span>decompressor_only</span></td>
-                        <td>AISHELL</td><td>25h</td><td>25Hz</td><td>275 bps</td><td>30.6%</td><td>2.95</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp E — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>30.6%</td><td>2.95</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 3</strong><span>decompressor_only</span></td>
-                        <td>AISHELL</td><td>25h</td><td>12.5Hz</td><td>137.5 bps</td><td>96.2%</td><td>2.51</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage3.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp E — Stage 3</strong></td>
+                        <td>12.5Hz</td><td>137.5 bps</td><td>96.2%</td><td>2.51</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage3.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp F — Stage 2</strong><span>both_ste</span></td>
-                        <td>AISHELL</td><td>25h</td><td>25Hz</td><td>275 bps</td><td>27.7%</td><td>2.82</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/exp_F_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp F — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>27.7%</td><td>2.82</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_F_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp G — Stage 2</strong><span></span></td>
-                        <td>Bilingual</td><td>50h</td><td>25Hz</td><td>275 bps</td><td>10.1%</td><td>3.02</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/exp_G_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp G — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>10.1%</td><td>3.02</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_G_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp H — Stage 2</strong><span></span></td>
-                        <td>Bilingual</td><td>100h</td><td>25Hz</td><td>275 bps</td><td>11.8%</td><td>3.07</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/exp_H_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp H — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>11.8%</td><td>3.07</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_H_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp I — Stage 2</strong><span>rebalanced loss</span></td>
-                        <td>Bilingual</td><td>100h</td><td>25Hz</td><td>275 bps</td><td>11.3%</td><td>3.31</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/exp_I_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp I — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td>11.3%</td><td>3.31</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_I_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-best">
-                        <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong><span>ASR Loss (λ=30)</span></td>
-                        <td>Bilingual</td><td>100h</td><td>25Hz</td><td>275 bps</td><td><strong>3.02%</strong></td><td>2.00</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/exp_J_stage2.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong></td>
+                        <td>25Hz</td><td>275 bps</td><td><strong>3.02%</strong></td><td>2.00</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_J_stage2.wav')">▶ Play</button></div></td>
                     </tr>
 
                     <tr class="row-best">
-                        <td class="col-model"><strong>Exp K — Stage 3</strong><span>ASR Loss (λ=20)</span></td>
-                        <td>Bilingual</td><td>100h</td><td>12.5Hz</td><td>137.5 bps</td><td>10.0%</td><td>1.44</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/exp_K_stage3.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- ════════ PRETRAINED FOCALCODEC ════════ -->
-    <div class="model-section" id="demo-pretrained">
-        <div class="model-header">
-            Pretrained FocalCodec — Official Models (No Fine-tuning)
-            <p>FocalCodec (50Hz / 25Hz / 12.5Hz) &nbsp;&amp;&nbsp; FocalCodec-S causal (2k / 4k / 65k codebook)</p>
-        </div>
-
-        <!-- CN -->
-        <div class="dataset-section">
-            <div class="dataset-title">Chinese — AISHELL-1 Test Set</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th class="col-model">Model</th>
-                        <th class="col-framerate">Frame Rate</th>
-                        <th style="width:100px;">Codebook</th>
-                        <th style="width:90px;">Bitrate</th>
-                        <th style="width:80px;">Causal</th>
-                        <th style="width:120px;">Audio</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="info-row">
-                        <td colspan="6">
-                            <strong>Sample:</strong> BAC009S0764W0121 &nbsp;|&nbsp;
-                            <strong>Speaker:</strong> S0764 &nbsp;|&nbsp;
-                            <strong>Duration:</strong> ~4.2s &nbsp;|&nbsp;
-                            <strong>Transcript:</strong> 甚至出现交易几乎停滞的情况
-                        </td>
-                    </tr>
-
-                    <tr class="row-ref">
-                        <td class="col-model"><strong>Original</strong><span>AISHELL-1 clean</span></td>
-                        <td>—</td><td>—</td><td>—</td><td>—</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/cn/original.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec 50Hz</strong><span>lucadellalib/focalcodec_50hz</span></td>
-                        <td>50Hz</td><td>1×8192</td><td>650 bps</td><td>❌</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_50hz.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec 25Hz</strong><span>lucadellalib/focalcodec_25hz</span></td>
-                        <td>25Hz</td><td>1×8192</td><td>325 bps</td><td>❌</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_25hz.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec 12.5Hz</strong><span>lucadellalib/focalcodec_12_5hz</span></td>
-                        <td>12.5Hz</td><td>1×8192</td><td>163 bps</td><td>❌</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_12_5hz.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec-S 2k causal</strong><span>lucadellalib/focalcodec_50hz_2k_causal</span></td>
-                        <td>50Hz</td><td>1×2048</td><td>550 bps</td><td>✅</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_2k.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec-S 4k causal</strong><span>lucadellalib/focalcodec_50hz_4k_causal</span></td>
-                        <td>50Hz</td><td>1×4096</td><td>600 bps</td><td>✅</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_4k.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec-S 65k causal</strong><span>lucadellalib/focalcodec_50hz_65k_causal</span></td>
-                        <td>50Hz</td><td>1×65536</td><td>800 bps</td><td>✅</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_65k.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- EN -->
-        <div class="dataset-section">
-            <div class="dataset-title">English — LibriSpeech test-clean</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th class="col-model">Model</th>
-                        <th class="col-framerate">Frame Rate</th>
-                        <th style="width:100px;">Codebook</th>
-                        <th style="width:90px;">Bitrate</th>
-                        <th style="width:80px;">Causal</th>
-                        <th style="width:120px;">Audio</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="info-row">
-                        <td colspan="6">
-                            <strong>Sample:</strong> 1089-134691-0002 &nbsp;|&nbsp;
-                            <strong>Speaker:</strong> 1089 &nbsp;|&nbsp;
-                            <strong>Duration:</strong> ~11.6s &nbsp;|&nbsp;
-                            <strong>Transcript:</strong> "He was in a fevered state of mind, owing to the blight on his hopes of Thornfield..."
-                        </td>
-                    </tr>
-
-                    <tr class="row-ref">
-                        <td class="col-model"><strong>Original</strong><span>LibriSpeech test-clean</span></td>
-                        <td>—</td><td>—</td><td>—</td><td>—</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/en/original.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec 50Hz</strong><span>lucadellalib/focalcodec_50hz</span></td>
-                        <td>50Hz</td><td>1×8192</td><td>650 bps</td><td>❌</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_50hz.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec 25Hz</strong><span>lucadellalib/focalcodec_25hz</span></td>
-                        <td>25Hz</td><td>1×8192</td><td>325 bps</td><td>❌</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_25hz.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec 12.5Hz</strong><span>lucadellalib/focalcodec_12_5hz</span></td>
-                        <td>12.5Hz</td><td>1×8192</td><td>163 bps</td><td>❌</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_12_5hz.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec-S 2k causal</strong><span>lucadellalib/focalcodec_50hz_2k_causal</span></td>
-                        <td>50Hz</td><td>1×2048</td><td>550 bps</td><td>✅</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_2k.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec-S 4k causal</strong><span>lucadellalib/focalcodec_50hz_4k_causal</span></td>
-                        <td>50Hz</td><td>1×4096</td><td>600 bps</td><td>✅</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_4k.wav')">▶ Play</button>
-                        </div></td>
-                    </tr>
-
-                    <tr>
-                        <td class="col-model"><strong>FocalCodec-S 65k causal</strong><span>lucadellalib/focalcodec_50hz_65k_causal</span></td>
-                        <td>50Hz</td><td>1×65536</td><td>800 bps</td><td>✅</td>
-                        <td><div class="audio-cell">
-                            <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_65k.wav')">▶ Play</button>
-                        </div></td>
+                        <td class="col-model"><strong>Exp K — Stage 3</strong></td>
+                        <td>12.5Hz</td><td>137.5 bps</td><td>10.0%</td><td>1.44</td>
+                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_K_stage3.wav')">▶ Play</button></div></td>
                     </tr>
                 </tbody>
             </table>
