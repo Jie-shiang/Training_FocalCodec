@@ -1,0 +1,118 @@
+# =============================================================================
+# Example Config: Stage 3 with Whisper ASR Loss (Exp K)
+# =============================================================================
+# Continue from a Stage 2 ASR-trained checkpoint (e.g., Exp J),
+# adding the 5th compressor/decompressor layer for Stage 3 (12.5Hz, 137.5 bps).
+#
+# Training script: train_stage3_asr.py (single GPU) or train_stage3_asr_ddp.py (multi-GPU)
+# Results (AISHELL-1 test, 2000 utts):
+#   Stage 3 (12.5Hz, 137.5 bps): dCER = 16.03%, MOS_Q = 1.330
+# Results (LibriSpeech test-clean, 2000 utts):
+#   Stage 3 (12.5Hz, 137.5 bps): dWER = 10.01%, MOS_Q = 1.437
+#
+# Comparison with Stage 2 (Exp J):
+#   dCER: 4.15% → 16.03% (+11.88 pp, extra compression costs)
+#   dWER: 3.02% → 10.01% (+6.99 pp)
+#
+# NOTE: Replace all paths marked with <YOUR_...> before training.
+
+# -----------------------------------------------------------------------------
+# Paths — CHANGE THESE TO YOUR OWN PATHS
+# -----------------------------------------------------------------------------
+paths:
+  base_dir: "<YOUR_PROJECT_DIR>"
+  focalcodec_dir: "<YOUR_PROJECT_DIR>/focalcodec"
+  model_cache_dir: "<YOUR_MODEL_CACHE_DIR>"
+  asr_cache_dir: "<YOUR_MODEL_CACHE_DIR>"
+  output_dir: "<YOUR_PROJECT_DIR>/output"
+  inference_dir: "<YOUR_PROJECT_DIR>/inference/my_exp_stage3"
+
+# -----------------------------------------------------------------------------
+# Data — CHANGE THESE TO YOUR OWN DATASET PATHS
+# -----------------------------------------------------------------------------
+data:
+  audio_base_path: "<YOUR_DATASET_ROOT>"
+  train_csv: "<YOUR_PROJECT_DIR>/data/train_split.csv"
+  val_csv: "<YOUR_PROJECT_DIR>/data/val_split.csv"
+  test_csv: "<YOUR_PROJECT_DIR>/data/test_split.csv"
+
+# CSV format:
+#   filepath,duration
+#   /path/to/audio.wav,3.21
+
+# -----------------------------------------------------------------------------
+# Model
+# -----------------------------------------------------------------------------
+model:
+  base_model: "lucadellalib/focalcodec_50hz_2k_causal"
+  teacher_model: "lucadellalib/focalcodec_25hz"
+  codebook_size: 2048
+
+# -----------------------------------------------------------------------------
+# Stage 3: 12.5Hz (137.5 bps) with ASR Loss
+# Load Stage 2 ASR-checkpoint, then add 5th compression layer
+# -----------------------------------------------------------------------------
+stage3:
+  # Source checkpoint — CHANGE to your Stage 2 ASR experiment name.
+  # The script will load: output/<source_experiment>/stage2_25hz/best_model.pt
+  source_experiment: "my_exp_asr_stage2"
+  source_stage: "stage2_25hz"
+
+  batch_size: 128        # reduce to 64 if OOM
+  chunk_duration: 3.0
+  overlap: 0.5
+  max_chunks: -1
+
+  # Dual learning rate strategy:
+  # - New 5th layer needs higher LR to learn compression
+  # - Old inherited layers use lower LR to preserve what was learned
+  learning_rate_old: 5.0e-05   # inherited from Stage 2 checkpoint
+  learning_rate_new: 5.0e-04   # new Stage 3 compression layer
+  weight_decay: 0.01
+
+  # Warmup: train only the new layer first (stabilizes new layer before unfreezing old)
+  warmup_epochs: 5
+
+  # Scheduler: ReduceLROnPlateau
+  scheduler_type: "plateau"
+  num_epochs: 10000
+  scheduler_factor: 0.5
+  scheduler_patience: 8
+  scheduler_threshold: 0.001
+  scheduler_cooldown: 3
+  scheduler_min_lr: 1.0e-06
+
+  # Gradient clipping
+  gradient_clip: 5.0
+
+  # Early stopping
+  patience: 30
+  min_delta: 0.0001
+
+  # =========================================================================
+  # Loss Weights
+  # Feature:Mel:STFT:ASR = 1:5:2:20 (Exp K — slightly lower ASR weight than J)
+  # =========================================================================
+  weight_feature: 1.0
+  weight_time: 0.0
+  use_mel_loss: true
+  weight_mel: 5.0
+  use_stft_loss: true
+  weight_stft: 2.0
+
+  # ASR Loss (lower than Stage 2 to preserve more audio quality at ultra-low bitrate)
+  use_asr_loss: true
+  weight_asr: 20.0          # reduced from 30.0 to balance semantics vs. quality
+  whisper_model: "small"    # multilingual: Chinese + English
+
+  # Mixed Precision (BF16 / AMP)
+  use_amp: true
+
+  # Monitoring
+  enable_codebook_monitor: true
+  log_interval: 10
+  num_workers: 4
+
+device: "cuda"
+num_workers: 4
+pin_memory: true

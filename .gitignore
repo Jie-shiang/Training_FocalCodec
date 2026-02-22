@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Model checkpoints and outputs (large files — do not commit)
+output/
+inference/
+logs/
+
+# Training data splits (may contain absolute paths specific to your machine)
+data/
+experiments/
+
+# Model cache (HuggingFace / Whisper downloads)
+.cache/
+model_cache/
+
+# Evaluation results
+Evaluation_Result/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

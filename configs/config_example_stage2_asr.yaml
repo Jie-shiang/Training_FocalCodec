@@ -1,0 +1,113 @@
+# =============================================================================
+# Example Config: Stage 2 with Whisper ASR Loss (Exp J)
+# =============================================================================
+# Continue fine-tuning from an existing Stage 2 checkpoint (e.g., Exp G/H/I),
+# adding Whisper Token Cross-Entropy Loss for direct semantic constraint.
+#
+# Reference: "From Hallucination to Articulation" (ICASSP 2026)
+#            https://github.com/stet-stet/lmloss-icassp2026
+#
+# Training script: train_stage3_asr.py  (also handles Stage 2 ASR training)
+# Results (AISHELL-1 test, 2000 utts):
+#   Stage 2 (25Hz, 275 bps): dCER = 4.15%, MOS_Q = 1.589
+# Results (LibriSpeech test-clean, 2000 utts):
+#   Stage 2 (25Hz, 275 bps): dWER = 3.02%, MOS_Q = 1.998
+#
+# Key finding: ASR Loss reduces dCER from ~16% to 4.15% (-12 pp),
+#              but audio quality (MOS_Q) drops significantly (2.95 → 1.59).
+#
+# NOTE: Replace all paths marked with <YOUR_...> before training.
+
+# -----------------------------------------------------------------------------
+# Paths — CHANGE THESE TO YOUR OWN PATHS
+# -----------------------------------------------------------------------------
+paths:
+  base_dir: "<YOUR_PROJECT_DIR>"             # e.g., /home/user/FocalCodec_Release
+  focalcodec_dir: "<YOUR_PROJECT_DIR>/focalcodec"
+  model_cache_dir: "<YOUR_MODEL_CACHE_DIR>"  # HuggingFace + Whisper model cache
+  asr_cache_dir: "<YOUR_MODEL_CACHE_DIR>"
+  output_dir: "<YOUR_PROJECT_DIR>/output"
+  inference_dir: "<YOUR_PROJECT_DIR>/inference/my_exp_asr"
+
+# -----------------------------------------------------------------------------
+# Data — CHANGE THESE TO YOUR OWN DATASET PATHS
+# -----------------------------------------------------------------------------
+data:
+  audio_base_path: "<YOUR_DATASET_ROOT>"
+  train_csv: "<YOUR_PROJECT_DIR>/data/train_split.csv"
+  val_csv: "<YOUR_PROJECT_DIR>/data/val_split.csv"
+  test_csv: "<YOUR_PROJECT_DIR>/data/test_split.csv"
+
+# CSV format:
+#   filepath,duration
+#   /path/to/audio.wav,3.21
+
+# -----------------------------------------------------------------------------
+# Model
+# -----------------------------------------------------------------------------
+model:
+  base_model: "lucadellalib/focalcodec_50hz_2k_causal"
+  teacher_model: "lucadellalib/focalcodec_25hz"
+  codebook_size: 2048
+
+# -----------------------------------------------------------------------------
+# Stage 2: ASR Loss Fine-tuning (continue from existing Stage 2 checkpoint)
+# -----------------------------------------------------------------------------
+stage2:
+  # Source checkpoint — CHANGE to the experiment folder name you want to continue from.
+  # The script will load: output/<source_experiment>/stage2_25hz/best_model.pt
+  source_experiment: "my_exp_baseline"
+
+  batch_size: 128        # ASR loss is memory-intensive; reduce to 64 if OOM
+  chunk_duration: 3.0
+  overlap: 0.5
+  max_chunks: -1
+
+  # Optimizer
+  learning_rate: 5.0e-05    # lower LR for continual fine-tuning with ASR loss
+  weight_decay: 0.01
+
+  # Scheduler: ReduceLROnPlateau
+  scheduler_type: "plateau"
+  num_epochs: 10000
+  scheduler_factor: 0.5
+  scheduler_patience: 8
+  scheduler_threshold: 0.001
+  scheduler_cooldown: 3
+  scheduler_min_lr: 1.0e-06
+
+  # Gradient clipping
+  gradient_clip: 5.0
+
+  # Early stopping
+  patience: 40
+  min_delta: 0.0001
+
+  # =========================================================================
+  # Loss Weights
+  # Feature:Mel:STFT:ASR = 1:5:2:30 (Exp J configuration)
+  # =========================================================================
+  weight_feature: 1.0       # WavLM feature MSE (semantic preservation)
+  weight_time: 0.0
+  use_mel_loss: true
+  weight_mel: 5.0           # Mel-spectrogram (timbre/prosody)
+  use_stft_loss: true
+  weight_stft: 2.0          # Multi-resolution STFT (high-freq details)
+
+  # Whisper ASR Loss — key addition for semantic constraint
+  use_asr_loss: true
+  weight_asr: 30.0          # λ=30.0 per ICASSP 2026 paper
+  whisper_model: "small"    # "small" multilingual: supports Chinese + English
+                            # Other options: "tiny", "base", "medium", "large-v3"
+
+  # Mixed Precision (AMP) — strongly recommended (saves ~40% VRAM)
+  use_amp: true
+
+  # Monitoring
+  enable_codebook_monitor: true
+  log_interval: 10
+  num_workers: 4
+
+device: "cuda"
+num_workers: 4
+pin_memory: true

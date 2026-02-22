@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocalCodec-S Bilingual Fine-tuning — Audio Demo</title>
+  <style>
+    /* ── Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 40px 24px 32px;
+      text-align: center;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+    header p  { font-size: 1rem; opacity: .88; max-width: 780px; margin: 0 auto; }
+    .badges   { margin-top: 14px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .badge    {
+      background: rgba(255,255,255,.2);
+      border: 1px solid rgba(255,255,255,.4);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: .82rem;
+      color: #fff;
+    }
+
+    /* ── Nav ── */
+    nav {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 6px rgba(0,0,0,.07);
+    }
+    nav a {
+      text-decoration: none;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: .85rem;
+      font-weight: 600;
+      color: #555;
+      border: 1px solid #ddd;
+      transition: background .15s, color .15s;
+    }
+    nav a:hover        { background: #667eea; color: #fff; border-color: #667eea; }
+    nav a.github       { background: #24292e; color: #fff; border-color: #24292e; }
+    nav a.github:hover { background: #000; border-color: #000; }
+
+    /* ── Main container ── */
+    main { max-width: 1400px; margin: 32px auto; padding: 0 20px 60px; }
+
+    /* ── Section card ── */
+    section {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+      margin-bottom: 36px;
+      overflow: hidden;
+    }
+    .section-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 16px 24px;
+    }
+    .section-header h2 { font-size: 1.2rem; font-weight: 700; }
+    .section-header p  { font-size: .88rem; opacity: .88; margin-top: 4px; }
+
+    /* ── Overview grid ── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      padding: 24px;
+    }
+    .exp-card {
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 14px 16px;
+      background: #fafafa;
+    }
+    .exp-card .exp-label {
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #764ba2;
+      margin-bottom: 4px;
+    }
+    .exp-card h3 { font-size: .95rem; font-weight: 700; color: #222; margin-bottom: 6px; }
+    .exp-card p  { font-size: .82rem; color: #555; line-height: 1.5; }
+    .metric-row  { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+    .metric      {
+      background: #ede9f8;
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: .78rem;
+      font-weight: 700;
+      color: #4a2e8a;
+    }
+    .metric.good { background: #d4edda; color: #1a5c2b; }
+    .metric.warn { background: #fff3cd; color: #7a5c00; }
+    .metric.bad  { background: #f8d7da; color: #721c24; }
+
+    /* ── Audio table ── */
+    .table-wrap { overflow-x: auto; padding: 0 0 4px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+    }
+    thead th {
+      background: #f8f9fa;
+      color: #444;
+      font-weight: 700;
+      text-align: center;
+      padding: 12px 10px;
+      border: 1px solid #ddd;
+      white-space: nowrap;
+    }
+    thead th.col-model { text-align: left; min-width: 170px; }
+    tbody tr:hover { background: #f5f0ff; }
+    td {
+      border: 1px solid #e8e8e8;
+      padding: 10px 8px;
+      vertical-align: middle;
+      text-align: center;
+    }
+    td.col-model {
+      text-align: left;
+      padding-left: 14px;
+      min-width: 170px;
+    }
+    td.col-model strong { display: block; font-size: .9rem; color: #222; }
+    td.col-model span   { font-size: .78rem; color: #666; }
+
+    /* highlight rows */
+    tr.row-best     { background: #f0fff4; }
+    tr.row-ref      { background: #f8f0ff; }
+    tr.row-baseline { background: #fffde7; }
+
+    /* ── Audio player ── */
+    .audio-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 120px; }
+    .play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #667eea;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      white-space: nowrap;
+    }
+    .play-btn:hover   { background: #5563d0; }
+    .play-btn:active  { transform: scale(.97); }
+    .play-btn.playing { background: #28a745; }
+    .play-btn.playing:hover { background: #1e8436; }
+    .play-btn svg { flex-shrink: 0; }
+    .na-label { color: #aaa; font-size: .8rem; font-style: italic; }
+
+    /* ── Transcript ── */
+    .transcript-box {
+      background: #f9f9f9;
+      border-left: 4px solid #764ba2;
+      border-radius: 0 6px 6px 0;
+      padding: 12px 18px;
+      margin: 20px 24px;
+      font-size: .9rem;
+      color: #333;
+      line-height: 1.7;
+    }
+    .transcript-box strong { color: #764ba2; }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      gap: 18px;
+      padding: 14px 24px;
+      border-top: 1px solid #eee;
+      flex-wrap: wrap;
+      font-size: .8rem;
+      color: #555;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot  { width: 12px; height: 12px; border-radius: 3px; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #888;
+      font-size: .82rem;
+    }
+    footer a { color: #667eea; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════ HEADER ════════════════════════════════════ -->
+<header>
+  <h1>FocalCodec-S Bilingual Fine-tuning</h1>
+  <p>Audio demo for FocalCodec-S fine-tuned on Chinese (AISHELL-1) and English (LibriSpeech)
+     using Whisper ASR Loss for semantic-focused ultra-low bitrate speech coding.</p>
+  <div class="badges">
+    <span class="badge">BIIC Lab @ NTHU</span>
+    <span class="badge">2026.02</span>
+    <span class="badge">25 Hz · 275 bps (Stage 2)</span>
+    <span class="badge">12.5 Hz · 137.5 bps (Stage 3)</span>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════ NAV ════════════════════════════════════ -->
+<nav>
+  <a href="#overview">Experiment Overview</a>
+  <a href="#demo-cn">Chinese Demo</a>
+  <a href="#demo-en">English Demo</a>
+  <a href="https://github.com/lucadellalib/focalcodec" class="github">FocalCodec GitHub</a>
+</nav>
+
+<main>
+
+<!-- ════════════════════════════════════ OVERVIEW ════════════════════════════════════ -->
+<section id="overview">
+  <div class="section-header">
+    <h2>Experiment Overview</h2>
+    <p>Progressive fine-tuning roadmap from Chinese-only to bilingual + Whisper ASR Loss</p>
+  </div>
+
+  <div class="overview-grid">
+
+    <div class="exp-card row-ref">
+      <div class="exp-label">Baseline</div>
+      <h3>Pretrained FocalCodec-S</h3>
+      <p>Official pretrained model (50Hz, 550 bps). No fine-tuning. Chinese performance is poor.</p>
+      <div class="metric-row">
+        <span class="metric bad">dCER 25.3%</span>
+        <span class="metric">MOS 2.78</span>
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-label">Overfitting Test</div>
+      <h3>Exp D — Stage 2</h3>
+      <p>Feature + Mel + STFT loss (1:10:5). Trained on test set to validate feasibility.</p>
+      <div class="metric-row">
+        <span class="metric warn">dCER 7.7%</span>
+        <span class="metric">Stage 2 / 25Hz</span>
+      </div>
+    </div>
+
+    <div class="exp-card row-baseline">
+      <div class="exp-label">Full Train · CN 25h</div>
+      <h3>Exp E — Stage 1 / 2 / 3</h3>
+      <p>decompressor_only mode. Loss (1:5:2). Best Chinese semantics among standard training.</p>
+      <div class="metric-row">
+        <span class="metric warn">S2 dCER 13.3%</span>
+        <span class="metric bad">S2 dWER 30.6%</span>
+      </div>
+    </div>
+
+    <div class="exp-card row-baseline">
+      <div class="exp-label">Full Train · CN 25h</div>
+      <h3>Exp F — Stage 2</h3>
+      <p>both_ste mode (Compressor + Decompressor). Better audio quality than Exp E.</p>
+      <div class="metric-row">
+        <span class="metric warn">S2 dCER 14.5%</span>
+        <span class="metric warn">S2 dWER 27.7%</span>
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-label">Bilingual · 50h</div>
+      <h3>Exp G — Stage 2</h3>
+      <p>50h mixed (25h CN + 25h EN). Significantly recovers English from Exp E Stage 1.</p>
+      <div class="metric-row">
+        <span class="metric warn">dCER 17.4%</span>
+        <span class="metric warn">dWER 10.1%</span>
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-label">Bilingual · 100h</div>
+      <h3>Exp H — Stage 2</h3>
+      <p>100h mixed (50h CN + 50h EN). More data, marginal improvement over Exp G.</p>
+      <div class="metric-row">
+        <span class="metric warn">dCER 16.4%</span>
+        <span class="metric warn">dWER 11.8%</span>
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-label">Bilingual · 100h + Rebalanced Loss</div>
+      <h3>Exp I — Stage 2</h3>
+      <p>Same data as H but adjusted loss (2:3:3). Better MOS but hits semantic ceiling.</p>
+      <div class="metric-row">
+        <span class="metric warn">dCER 16.6%</span>
+        <span class="metric">MOS 2.95 ↑</span>
+      </div>
+    </div>
+
+    <div class="exp-card row-best">
+      <div class="exp-label">ASR Loss · 275 bps ⭐</div>
+      <h3>Exp J — Stage 2</h3>
+      <p>Whisper Token CE Loss (λ=30). Breaks the semantic ceiling. Best intelligibility.</p>
+      <div class="metric-row">
+        <span class="metric good">dCER 4.15%</span>
+        <span class="metric good">dWER 3.02%</span>
+        <span class="metric bad">MOS 1.59 ↓</span>
+      </div>
+    </div>
+
+    <div class="exp-card row-best">
+      <div class="exp-label">ASR Loss · 137.5 bps</div>
+      <h3>Exp K — Stage 3</h3>
+      <p>Stage 3 (12.5Hz) from Exp J. Ultra-low bitrate with ASR Loss (λ=20).</p>
+      <div class="metric-row">
+        <span class="metric warn">dCER 16.0%</span>
+        <span class="metric warn">dWER 10.0%</span>
+        <span class="metric bad">MOS 1.33 ↓</span>
+      </div>
+    </div>
+
+  </div><!-- /overview-grid -->
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#f0fff4;border:1px solid #28a745;"></div> Best results (Exp J/K)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#fffde7;border:1px solid #e0a800;"></div> Full-train baselines (Exp E/F)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f8f0ff;border:1px solid #764ba2;"></div> Pretrained reference</div>
+    <div class="legend-item"><span style="color:#1a5c2b;font-weight:700;">Green metric</span> = good (&lt;10%)</div>
+    <div class="legend-item"><span style="color:#7a5c00;font-weight:700;">Yellow metric</span> = moderate (10-25%)</div>
+    <div class="legend-item"><span style="color:#721c24;font-weight:700;">Red metric</span> = poor (&gt;25% or low MOS)</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ CHINESE DEMO ════════════════════════════════════ -->
+<section id="demo-cn">
+  <div class="section-header">
+    <h2>Chinese Demo — AISHELL-1 Test Set</h2>
+    <p>Sample: BAC009S0764W0121 &nbsp;|&nbsp; Speaker: S0764 &nbsp;|&nbsp; Duration: ~4.2s</p>
+  </div>
+
+  <div class="transcript-box">
+    <strong>Transcript:</strong> 甚至出现交易几乎停滞的情况
+    <br><em style="color:#888;font-size:.82rem;">(Even leading to a situation where trading came almost to a standstill.)</em>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-model">Model</th>
+          <th>Bitrate</th>
+          <th>dCER ↓</th>
+          <th>MOS_Q ↑</th>
+          <th>Audio</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr class="row-ref">
+          <td class="col-model"><strong>Original</strong><span>AISHELL-1 clean</span></td>
+          <td>—</td><td>—</td><td>—</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/original.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-ref">
+          <td class="col-model"><strong>Pretrained FocalCodec-S</strong><span>50Hz · 550 bps · no fine-tuning</span></td>
+          <td>550 bps</td><td>25.3%</td><td>2.78</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/pretrained.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr>
+          <td class="col-model"><strong>Exp D — Stage 2</strong><span>Overfitting test · 25Hz · loss 1:10:5</span></td>
+          <td>275 bps</td><td>7.7%</td><td>—</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/exp_D_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-baseline">
+          <td class="col-model"><strong>Exp E — Stage 1</strong><span>decompressor_only · 50Hz · CN 25h</span></td>
+          <td>550 bps</td><td>6.17%</td><td>2.96</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/exp_E_stage1.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-baseline">
+          <td class="col-model"><strong>Exp E — Stage 2</strong><span>decompressor_only · 25Hz · CN 25h</span></td>
+          <td>275 bps</td><td>13.3%</td><td>2.74</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/exp_E_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-baseline">
+          <td class="col-model"><strong>Exp E — Stage 3</strong><span>decompressor_only · 12.5Hz · CN 25h</span></td>
+          <td>137.5 bps</td><td>43.6%</td><td>2.42</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/exp_E_stage3.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr>
+          <td class="col-model"><strong>Exp F — Stage 2</strong><span>both_ste · 25Hz · CN 25h</span></td>
+          <td>275 bps</td><td>14.5%</td><td>2.68</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/exp_F_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr>
+          <td class="col-model"><strong>Exp G — Stage 2</strong><span>Bilingual · 25Hz · 50h (25h CN+EN)</span></td>
+          <td>275 bps</td><td>17.4%</td><td>2.65</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/exp_G_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr>
+          <td class="col-model"><strong>Exp H — Stage 2</strong><span>Bilingual · 25Hz · 100h (50h CN+EN)</span></td>
+          <td>275 bps</td><td>16.4%</td><td>2.71</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/exp_H_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr>
+          <td class="col-model"><strong>Exp I — Stage 2</strong><span>Bilingual · 25Hz · 100h · rebalanced loss</span></td>
+          <td>275 bps</td><td>16.6%</td><td>2.95</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/exp_I_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-best">
+          <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong><span>ASR Loss (λ=30) · 25Hz · 100h bilingual</span></td>
+          <td>275 bps</td><td><strong>4.15%</strong></td><td>1.59</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/exp_J_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-best">
+          <td class="col-model"><strong>Exp K — Stage 3</strong><span>ASR Loss (λ=20) · 12.5Hz · 100h bilingual</span></td>
+          <td>137.5 bps</td><td>16.0%</td><td>1.33</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/cn/exp_K_stage3.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div><!-- /table-wrap -->
+</section>
+
+<!-- ════════════════════════════════════ ENGLISH DEMO ════════════════════════════════════ -->
+<section id="demo-en">
+  <div class="section-header">
+    <h2>English Demo — LibriSpeech test-clean</h2>
+    <p>Sample: 1089-134691-0002 &nbsp;|&nbsp; Speaker: 1089 &nbsp;|&nbsp; Duration: ~11.6s</p>
+  </div>
+
+  <div class="transcript-box">
+    <strong>Transcript:</strong>
+    "He was in a fevered state of mind, owing to the blight on his hopes of Thornfield, and his failure to make even a tolerable settlement on Adèle."
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-model">Model</th>
+          <th>Bitrate</th>
+          <th>dWER ↓</th>
+          <th>MOS_Q ↑</th>
+          <th>Audio</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr class="row-ref">
+          <td class="col-model"><strong>Original</strong><span>LibriSpeech test-clean</span></td>
+          <td>—</td><td>—</td><td>—</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/en/original.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-ref">
+          <td class="col-model"><strong>Pretrained FocalCodec-S</strong><span>50Hz · 550 bps · no fine-tuning</span></td>
+          <td>550 bps</td><td>1.64%</td><td>3.71</td>
+          <td><div class="audio-cell">
+            <span class="na-label">Not available<br><small>(Chinese-only pretrained run)</small></span>
+          </div></td>
+        </tr>
+
+        <tr class="row-baseline">
+          <td class="col-model"><strong>Exp E — Stage 1</strong><span>decompressor_only · 50Hz · CN 25h</span></td>
+          <td>550 bps</td><td>3.87%</td><td>3.32</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/en/exp_E_stage1.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-baseline">
+          <td class="col-model"><strong>Exp E — Stage 2</strong><span>decompressor_only · 25Hz · CN 25h</span></td>
+          <td>275 bps</td><td>30.6%</td><td>2.95</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/en/exp_E_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-baseline">
+          <td class="col-model"><strong>Exp E — Stage 3</strong><span>decompressor_only · 12.5Hz · CN 25h</span></td>
+          <td>137.5 bps</td><td>96.2%</td><td>2.51</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/en/exp_E_stage3.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr>
+          <td class="col-model"><strong>Exp F — Stage 2</strong><span>both_ste · 25Hz · CN 25h</span></td>
+          <td>275 bps</td><td>27.7%</td><td>2.82</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/en/exp_F_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr>
+          <td class="col-model"><strong>Exp G — Stage 2</strong><span>Bilingual · 25Hz · 50h</span></td>
+          <td>275 bps</td><td>10.1%</td><td>3.02</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/en/exp_G_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr>
+          <td class="col-model"><strong>Exp H — Stage 2</strong><span>Bilingual · 25Hz · 100h</span></td>
+          <td>275 bps</td><td>11.8%</td><td>3.07</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/en/exp_H_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr>
+          <td class="col-model"><strong>Exp I — Stage 2</strong><span>Bilingual · 25Hz · 100h · rebalanced loss</span></td>
+          <td>275 bps</td><td>11.3%</td><td>3.31</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/en/exp_I_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-best">
+          <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong><span>ASR Loss (λ=30) · 25Hz · 100h bilingual</span></td>
+          <td>275 bps</td><td><strong>3.02%</strong></td><td>2.00</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/en/exp_J_stage2.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+        <tr class="row-best">
+          <td class="col-model"><strong>Exp K — Stage 3</strong><span>ASR Loss (λ=20) · 12.5Hz · 100h bilingual</span></td>
+          <td>137.5 bps</td><td>10.0%</td><td>1.44</td>
+          <td><div class="audio-cell">
+            <button class="play-btn" onclick="togglePlay(this,'audio/en/exp_K_stage3.wav')">
+              <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg> Play
+            </button>
+          </div></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div><!-- /table-wrap -->
+</section>
+
+</main>
+
+<!-- ════════════════════════════════════ FOOTER ════════════════════════════════════ -->
+<footer>
+  <p>
+    FocalCodec-S fine-tuning by BIIC Lab, NTHU &nbsp;|&nbsp;
+    Original model: <a href="https://github.com/lucadellalib/focalcodec" target="_blank">lucadellalib/focalcodec</a> &nbsp;|&nbsp;
+    ASR Loss: <a href="https://github.com/stet-stet/lmloss-icassp2026" target="_blank">ICASSP 2026</a>
+  </p>
+</footer>
+
+<!-- ════════════════════════════════════ JS ════════════════════════════════════ -->
+<script>
+  // Single global audio player — only one plays at a time
+  let currentAudio = null;
+  let currentBtn   = null;
+
+  const PLAY_ICON = `<svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg>`;
+  const STOP_ICON = `<svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="1" width="3" height="10" fill="currentColor"/><rect x="7" y="1" width="3" height="10" fill="currentColor"/></svg>`;
+
+  function togglePlay(btn, src) {
+    // If clicking the currently playing button → stop
+    if (currentBtn === btn) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      resetBtn(btn);
+      currentAudio = null;
+      currentBtn = null;
+      return;
+    }
+
+    // Stop previous
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      resetBtn(currentBtn);
+    }
+
+    // Start new
+    const audio = new Audio(src);
+    audio.play().catch(() => {
+      alert('Could not load audio: ' + src);
+      resetBtn(btn);
+    });
+
+    btn.classList.add('playing');
+    btn.innerHTML = STOP_ICON + ' Stop';
+    currentAudio = audio;
+    currentBtn   = btn;
+
+    audio.addEventListener('ended', () => {
+      resetBtn(btn);
+      currentAudio = null;
+      currentBtn = null;
+    });
+  }
+
+  function resetBtn(btn) {
+    btn.classList.remove('playing');
+    btn.innerHTML = PLAY_ICON + ' Play';
+  }
+</script>
+
+</body>
+</html>
