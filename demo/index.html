@@ -76,18 +76,18 @@
             border-radius: 5px;
         }
 
-        .transcript-box {
+        /* info row inside table */
+        tr.info-row td {
             background: #f9f9f9;
             border-left: 4px solid #764ba2;
-            border-radius: 0 6px 6px 0;
+            text-align: left;
             padding: 10px 16px;
-            margin-bottom: 12px;
             font-size: 13px;
             color: #333;
             line-height: 1.7;
         }
 
-        .transcript-box strong { color: #764ba2; }
+        tr.info-row td strong { color: #764ba2; }
 
         /* ── Table ── */
         table {
@@ -112,6 +112,9 @@
         }
 
         th.col-model { text-align: left; min-width: 200px; }
+        th.col-training { width: 110px; }
+        th.col-time { width: 70px; }
+        th.col-framerate { width: 90px; }
 
         td.col-model {
             text-align: left;
@@ -165,19 +168,16 @@
     <div class="model-section" id="demo-cn">
         <div class="model-header">
             Chinese Demo — AISHELL-1 Test Set
-            <p>Sample: BAC009S0764W0121 &nbsp;|&nbsp; Speaker: S0764 &nbsp;|&nbsp; Duration: ~4.2s</p>
         </div>
 
         <div class="dataset-section">
-            <div class="transcript-box">
-                <strong>Transcript:</strong> 甚至出现交易几乎停滞的情况
-                <br><em style="color:#888;font-size:11px;">(Even leading to a situation where trading came almost to a standstill.)</em>
-            </div>
-
             <table>
                 <thead>
                     <tr>
                         <th class="col-model">Model</th>
+                        <th class="col-training">Training Data</th>
+                        <th class="col-time">Time</th>
+                        <th class="col-framerate">Frame Rate</th>
                         <th style="width:90px;">Bitrate</th>
                         <th style="width:80px;">dCER ↓</th>
                         <th style="width:80px;">MOS_Q ↑</th>
@@ -186,97 +186,106 @@
                 </thead>
                 <tbody>
 
+                    <tr class="info-row">
+                        <td colspan="8">
+                            <strong>Sample:</strong> BAC009S0764W0121 &nbsp;|&nbsp;
+                            <strong>Speaker:</strong> S0764 &nbsp;|&nbsp;
+                            <strong>Duration:</strong> ~4.2s &nbsp;|&nbsp;
+                            <strong>Transcript:</strong> 甚至出现交易几乎停滞的情况
+                        </td>
+                    </tr>
+
                     <tr class="row-ref">
                         <td class="col-model"><strong>Original</strong><span>AISHELL-1 clean</span></td>
-                        <td>—</td><td>—</td><td>—</td>
+                        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/original.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-ref">
-                        <td class="col-model"><strong>Pretrained FocalCodec-S</strong><span>50Hz · 550 bps · no fine-tuning</span></td>
-                        <td>550 bps</td><td>25.3%</td><td>2.78</td>
+                        <td class="col-model"><strong>Pretrained FocalCodec-S</strong><span>no fine-tuning</span></td>
+                        <td>—</td><td>—</td><td>50Hz</td><td>550 bps</td><td>25.3%</td><td>2.78</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/pretrained.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp D — Stage 2</strong><span>Overfitting test · 25Hz · loss 1:10:5</span></td>
-                        <td>275 bps</td><td>7.7%</td><td>—</td>
+                        <td class="col-model"><strong>Exp D — Stage 2</strong><span>Overfitting test · loss 1:10:5</span></td>
+                        <td>AISHELL</td><td>—</td><td>25Hz</td><td>275 bps</td><td>7.7%</td><td>—</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_D_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 1</strong><span>decompressor_only · 50Hz · CN 25h</span></td>
-                        <td>550 bps</td><td>6.17%</td><td>2.96</td>
+                        <td class="col-model"><strong>Exp E — Stage 1</strong><span>decompressor_only</span></td>
+                        <td>AISHELL</td><td>25h</td><td>50Hz</td><td>550 bps</td><td>6.17%</td><td>2.96</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage1.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 2</strong><span>decompressor_only · 25Hz · CN 25h</span></td>
-                        <td>275 bps</td><td>13.3%</td><td>2.74</td>
+                        <td class="col-model"><strong>Exp E — Stage 2</strong><span>decompressor_only</span></td>
+                        <td>AISHELL</td><td>25h</td><td>25Hz</td><td>275 bps</td><td>13.3%</td><td>2.74</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 3</strong><span>decompressor_only · 12.5Hz · CN 25h</span></td>
-                        <td>137.5 bps</td><td>43.6%</td><td>2.42</td>
+                        <td class="col-model"><strong>Exp E — Stage 3</strong><span>decompressor_only</span></td>
+                        <td>AISHELL</td><td>25h</td><td>12.5Hz</td><td>137.5 bps</td><td>43.6%</td><td>2.42</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage3.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp F — Stage 2</strong><span>both_ste · 25Hz · CN 25h</span></td>
-                        <td>275 bps</td><td>14.5%</td><td>2.68</td>
+                        <td class="col-model"><strong>Exp F — Stage 2</strong><span>both_ste</span></td>
+                        <td>AISHELL</td><td>25h</td><td>25Hz</td><td>275 bps</td><td>14.5%</td><td>2.68</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_F_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp G — Stage 2</strong><span>Bilingual · 25Hz · 50h (25h CN+EN)</span></td>
-                        <td>275 bps</td><td>17.4%</td><td>2.65</td>
+                        <td class="col-model"><strong>Exp G — Stage 2</strong><span></span></td>
+                        <td>Bilingual</td><td>50h (25h CN+EN)</td><td>25Hz</td><td>275 bps</td><td>17.4%</td><td>2.65</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_G_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp H — Stage 2</strong><span>Bilingual · 25Hz · 100h (50h CN+EN)</span></td>
-                        <td>275 bps</td><td>16.4%</td><td>2.71</td>
+                        <td class="col-model"><strong>Exp H — Stage 2</strong><span></span></td>
+                        <td>Bilingual</td><td>100h (50h CN+EN)</td><td>25Hz</td><td>275 bps</td><td>16.4%</td><td>2.71</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_H_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp I — Stage 2</strong><span>Bilingual · 25Hz · 100h · rebalanced loss</span></td>
-                        <td>275 bps</td><td>16.6%</td><td>2.95</td>
+                        <td class="col-model"><strong>Exp I — Stage 2</strong><span>rebalanced loss</span></td>
+                        <td>Bilingual</td><td>100h</td><td>25Hz</td><td>275 bps</td><td>16.6%</td><td>2.95</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_I_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-best">
-                        <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong><span>ASR Loss (λ=30) · 25Hz · 100h bilingual</span></td>
-                        <td>275 bps</td><td><strong>4.15%</strong></td><td>1.59</td>
+                        <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong><span>ASR Loss (λ=30)</span></td>
+                        <td>Bilingual</td><td>100h</td><td>25Hz</td><td>275 bps</td><td><strong>4.15%</strong></td><td>1.59</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_J_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-best">
-                        <td class="col-model"><strong>Exp K — Stage 3</strong><span>ASR Loss (λ=20) · 12.5Hz · 100h bilingual</span></td>
-                        <td>137.5 bps</td><td>16.0%</td><td>1.33</td>
+                        <td class="col-model"><strong>Exp K — Stage 3</strong><span>ASR Loss (λ=20)</span></td>
+                        <td>Bilingual</td><td>100h</td><td>12.5Hz</td><td>137.5 bps</td><td>16.0%</td><td>1.33</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_K_stage3.wav')">▶ Play</button>
                         </div></td>
@@ -291,19 +300,16 @@
     <div class="model-section" id="demo-en">
         <div class="model-header">
             English Demo — LibriSpeech test-clean
-            <p>Sample: 1089-134691-0002 &nbsp;|&nbsp; Speaker: 1089 &nbsp;|&nbsp; Duration: ~11.6s</p>
         </div>
 
         <div class="dataset-section">
-            <div class="transcript-box">
-                <strong>Transcript:</strong>
-                "He was in a fevered state of mind, owing to the blight on his hopes of Thornfield, and his failure to make even a tolerable settlement on Adèle."
-            </div>
-
             <table>
                 <thead>
                     <tr>
                         <th class="col-model">Model</th>
+                        <th class="col-training">Training Data</th>
+                        <th class="col-time">Time</th>
+                        <th class="col-framerate">Frame Rate</th>
                         <th style="width:90px;">Bitrate</th>
                         <th style="width:80px;">dWER ↓</th>
                         <th style="width:80px;">MOS_Q ↑</th>
@@ -312,89 +318,98 @@
                 </thead>
                 <tbody>
 
+                    <tr class="info-row">
+                        <td colspan="8">
+                            <strong>Sample:</strong> 1089-134691-0002 &nbsp;|&nbsp;
+                            <strong>Speaker:</strong> 1089 &nbsp;|&nbsp;
+                            <strong>Duration:</strong> ~11.6s &nbsp;|&nbsp;
+                            <strong>Transcript:</strong> "He was in a fevered state of mind, owing to the blight on his hopes of Thornfield, and his failure to make even a tolerable settlement on Adèle."
+                        </td>
+                    </tr>
+
                     <tr class="row-ref">
                         <td class="col-model"><strong>Original</strong><span>LibriSpeech test-clean</span></td>
-                        <td>—</td><td>—</td><td>—</td>
+                        <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/en/original.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-ref">
-                        <td class="col-model"><strong>Pretrained FocalCodec-S</strong><span>50Hz · 550 bps · no fine-tuning</span></td>
-                        <td>550 bps</td><td>1.64%</td><td>3.71</td>
+                        <td class="col-model"><strong>Pretrained FocalCodec-S</strong><span>no fine-tuning</span></td>
+                        <td>—</td><td>—</td><td>50Hz</td><td>550 bps</td><td>1.64%</td><td>3.71</td>
                         <td><div class="audio-cell">
                             <span class="no-audio">Not available<br><small>(Chinese-only pretrained run)</small></span>
                         </div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 1</strong><span>decompressor_only · 50Hz · CN 25h</span></td>
-                        <td>550 bps</td><td>3.87%</td><td>3.32</td>
+                        <td class="col-model"><strong>Exp E — Stage 1</strong><span>decompressor_only</span></td>
+                        <td>AISHELL</td><td>25h</td><td>50Hz</td><td>550 bps</td><td>3.87%</td><td>3.32</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage1.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 2</strong><span>decompressor_only · 25Hz · CN 25h</span></td>
-                        <td>275 bps</td><td>30.6%</td><td>2.95</td>
+                        <td class="col-model"><strong>Exp E — Stage 2</strong><span>decompressor_only</span></td>
+                        <td>AISHELL</td><td>25h</td><td>25Hz</td><td>275 bps</td><td>30.6%</td><td>2.95</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-baseline">
-                        <td class="col-model"><strong>Exp E — Stage 3</strong><span>decompressor_only · 12.5Hz · CN 25h</span></td>
-                        <td>137.5 bps</td><td>96.2%</td><td>2.51</td>
+                        <td class="col-model"><strong>Exp E — Stage 3</strong><span>decompressor_only</span></td>
+                        <td>AISHELL</td><td>25h</td><td>12.5Hz</td><td>137.5 bps</td><td>96.2%</td><td>2.51</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage3.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp F — Stage 2</strong><span>both_ste · 25Hz · CN 25h</span></td>
-                        <td>275 bps</td><td>27.7%</td><td>2.82</td>
+                        <td class="col-model"><strong>Exp F — Stage 2</strong><span>both_ste</span></td>
+                        <td>AISHELL</td><td>25h</td><td>25Hz</td><td>275 bps</td><td>27.7%</td><td>2.82</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/en/exp_F_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp G — Stage 2</strong><span>Bilingual · 25Hz · 50h</span></td>
-                        <td>275 bps</td><td>10.1%</td><td>3.02</td>
+                        <td class="col-model"><strong>Exp G — Stage 2</strong><span></span></td>
+                        <td>Bilingual</td><td>50h</td><td>25Hz</td><td>275 bps</td><td>10.1%</td><td>3.02</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/en/exp_G_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp H — Stage 2</strong><span>Bilingual · 25Hz · 100h</span></td>
-                        <td>275 bps</td><td>11.8%</td><td>3.07</td>
+                        <td class="col-model"><strong>Exp H — Stage 2</strong><span></span></td>
+                        <td>Bilingual</td><td>100h</td><td>25Hz</td><td>275 bps</td><td>11.8%</td><td>3.07</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/en/exp_H_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp I — Stage 2</strong><span>Bilingual · 25Hz · 100h · rebalanced loss</span></td>
-                        <td>275 bps</td><td>11.3%</td><td>3.31</td>
+                        <td class="col-model"><strong>Exp I — Stage 2</strong><span>rebalanced loss</span></td>
+                        <td>Bilingual</td><td>100h</td><td>25Hz</td><td>275 bps</td><td>11.3%</td><td>3.31</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/en/exp_I_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-best">
-                        <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong><span>ASR Loss (λ=30) · 25Hz · 100h bilingual</span></td>
-                        <td>275 bps</td><td><strong>3.02%</strong></td><td>2.00</td>
+                        <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong><span>ASR Loss (λ=30)</span></td>
+                        <td>Bilingual</td><td>100h</td><td>25Hz</td><td>275 bps</td><td><strong>3.02%</strong></td><td>2.00</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/en/exp_J_stage2.wav')">▶ Play</button>
                         </div></td>
                     </tr>
 
                     <tr class="row-best">
-                        <td class="col-model"><strong>Exp K — Stage 3</strong><span>ASR Loss (λ=20) · 12.5Hz · 100h bilingual</span></td>
-                        <td>137.5 bps</td><td>10.0%</td><td>1.44</td>
+                        <td class="col-model"><strong>Exp K — Stage 3</strong><span>ASR Loss (λ=20)</span></td>
+                        <td>Bilingual</td><td>100h</td><td>12.5Hz</td><td>137.5 bps</td><td>10.0%</td><td>1.44</td>
                         <td><div class="audio-cell">
                             <button class="play-button" onclick="togglePlay(this,'audio/en/exp_K_stage3.wav')">▶ Play</button>
                         </div></td>
