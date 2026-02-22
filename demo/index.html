@@ -94,12 +94,12 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            font-size: 12px;
+            font-size: 14px;
         }
 
         th, td {
             border: 1px solid #ddd;
-            padding: 8px 6px;
+            padding: 10px 8px;
             text-align: center;
             vertical-align: middle;
         }
@@ -108,10 +108,10 @@
             background-color: #f8f9fa;
             font-weight: bold;
             color: #495057;
-            font-size: 11px;
+            font-size: 13px;
         }
 
-        th.col-model { text-align: left; min-width: 200px; }
+        th.col-model { text-align: left; width: 220px; max-width: 220px; }
         th.col-training { width: 110px; }
         th.col-time { width: 70px; }
         th.col-framerate { width: 90px; }
@@ -119,10 +119,11 @@
         td.col-model {
             text-align: left;
             padding-left: 10px;
-            min-width: 200px;
+            width: 220px;
+            max-width: 220px;
         }
 
-        td.col-model strong { display: block; font-size: 13px; color: #222; }
+        td.col-model strong { display: block; font-size: 14px; color: #222; }
         td.col-model span   { font-size: 11px; color: #666; }
 
         tbody tr:hover { background-color: #f5f0ff; }
