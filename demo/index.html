@@ -414,8 +414,8 @@
                     <tr>
                         <td class="col-model"><strong>Exp F — Stage 3</strong></td>
                         <td>12.5Hz</td><td>137.5 bps</td>
-                        <td class="metric overall">—</td><td class="metric overall">—</td>
-                        <td class="metric sample" data-cn-exp="expF_s3" data-metric="dcer">38.46%</td>
+                        <td class="metric overall">39.51%</td><td class="metric overall">2.31</td>
+                        <td class="metric sample" data-cn-exp="expF_s3" data-metric="dcer">0.00%</td>
                         <td class="metric sample" data-cn-exp="expF_s3" data-metric="mos">2.09</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button cn-audio" data-exp="expF_s3" onclick="togglePlay(this, getCNAudio('expF_s3'))">&#9654; Play</button>
@@ -661,8 +661,8 @@
                     <tr>
                         <td class="col-model"><strong>Exp F — Stage 3</strong></td>
                         <td>12.5Hz</td><td>137.5 bps</td>
-                        <td class="metric overall">—</td><td class="metric overall">—</td>
-                        <td class="metric sample" data-en-exp="expF_s3" data-metric="dwer">100.00%</td>
+                        <td class="metric overall">93.14%</td><td class="metric overall">2.34</td>
+                        <td class="metric sample" data-en-exp="expF_s3" data-metric="dwer">4.76%</td>
                         <td class="metric sample" data-en-exp="expF_s3" data-metric="mos">2.46</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button en-audio" data-exp="expF_s3" onclick="togglePlay(this, getENAudio('expF_s3'))">&#9654; Play</button>
@@ -1198,6 +1198,20 @@ function switchSampleEN(val) {
         flashCell(cell);
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Populate sample metric cells from JS data on initial page load
+    const initCN = CN_METRICS['default'];
+    document.querySelectorAll('[data-cn-exp]').forEach(cell => {
+        const row = initCN[cell.dataset.cnExp];
+        cell.textContent = row ? (cell.dataset.metric === 'dcer' ? row.dcer : row.mos) : '—';
+    });
+    const initEN = EN_METRICS['default'];
+    document.querySelectorAll('[data-en-exp]').forEach(cell => {
+        const row = initEN[cell.dataset.enExp];
+        cell.textContent = row ? (cell.dataset.metric === 'dwer' ? row.dwer : row.mos) : '—';
+    });
+});
 </script>
 
 </body>
