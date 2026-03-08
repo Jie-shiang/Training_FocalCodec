@@ -249,7 +249,7 @@
                 </thead>
                 <tbody>
                     <tr class="info-row">
-                        <td colspan="6">
+                        <td colspan="8">
                             <div class="sample-selector-row">
                                 <label><strong>Sample:</strong></label>
                                 <select class="sample-select" id="cn-sample-select" onchange="switchSampleCN(this.value)">
@@ -289,7 +289,7 @@
                         <td class="col-model"><strong>Pretrained FocalCodec 50Hz</strong></td>
                         <td>50Hz</td><td>650 bps</td>
                         <td class="metric overall">0.00%</td><td class="metric overall">2.34</td>
-                        <td class="metric sample">—</td><td class="metric sample">—</td>
+                        <td class="metric sample" data-cn-exp="pretrain_50hz" data-metric="dcer">0.00%</td><td class="metric sample" data-cn-exp="pretrain_50hz" data-metric="mos">3.08</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_50hz.wav')">&#9654; Play</button>
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
@@ -300,7 +300,7 @@
                         <td class="col-model"><strong>Pretrained FocalCodec 25Hz</strong></td>
                         <td>25Hz</td><td>325 bps</td>
                         <td class="metric overall">0.00%</td><td class="metric overall">2.43</td>
-                        <td class="metric sample">—</td><td class="metric sample">—</td>
+                        <td class="metric sample" data-cn-exp="pretrain_25hz" data-metric="dcer">0.00%</td><td class="metric sample" data-cn-exp="pretrain_25hz" data-metric="mos">2.84</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_25hz.wav')">&#9654; Play</button>
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
@@ -311,7 +311,7 @@
                         <td class="col-model"><strong>Pretrained FocalCodec 12.5Hz</strong></td>
                         <td>12.5Hz</td><td>163 bps</td>
                         <td class="metric overall">46.15%</td><td class="metric overall">2.83</td>
-                        <td class="metric sample">—</td><td class="metric sample">—</td>
+                        <td class="metric sample" data-cn-exp="pretrain_12_5hz" data-metric="dcer">0.00%</td><td class="metric sample" data-cn-exp="pretrain_12_5hz" data-metric="mos">3.26</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_12_5hz.wav')">&#9654; Play</button>
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
@@ -322,7 +322,7 @@
                         <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 2k</strong></td>
                         <td>50Hz</td><td>550 bps</td>
                         <td class="metric overall">15.38%</td><td class="metric overall">2.51</td>
-                        <td class="metric sample">—</td><td class="metric sample">—</td>
+                        <td class="metric sample" data-cn-exp="pretrain_s_2k" data-metric="dcer">0.00%</td><td class="metric sample" data-cn-exp="pretrain_s_2k" data-metric="mos">3.08</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_2k.wav')">&#9654; Play</button>
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
@@ -333,7 +333,7 @@
                         <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 4k</strong></td>
                         <td>50Hz</td><td>600 bps</td>
                         <td class="metric overall">30.77%</td><td class="metric overall">2.46</td>
-                        <td class="metric sample">—</td><td class="metric sample">—</td>
+                        <td class="metric sample" data-cn-exp="pretrain_s_4k" data-metric="dcer">0.00%</td><td class="metric sample" data-cn-exp="pretrain_s_4k" data-metric="mos">2.26</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_4k.wav')">&#9654; Play</button>
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
@@ -344,7 +344,7 @@
                         <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 65k</strong></td>
                         <td>50Hz</td><td>800 bps</td>
                         <td class="metric overall">15.38%</td><td class="metric overall">2.62</td>
-                        <td class="metric sample">—</td><td class="metric sample">—</td>
+                        <td class="metric sample" data-cn-exp="pretrain_s_65k" data-metric="dcer">0.00%</td><td class="metric sample" data-cn-exp="pretrain_s_65k" data-metric="mos">3.06</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_65k.wav')">&#9654; Play</button>
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
@@ -510,7 +510,7 @@
                 </thead>
                 <tbody>
                     <tr class="info-row">
-                        <td colspan="6">
+                        <td colspan="8">
                             <div class="sample-selector-row">
                                 <label><strong>Sample:</strong></label>
                                 <select class="sample-select" id="en-sample-select" onchange="switchSampleEN(this.value)">
@@ -548,7 +548,7 @@
                         <td class="col-model"><strong>Pretrained FocalCodec 50Hz</strong></td>
                         <td>50Hz</td><td>650 bps</td>
                         <td class="metric overall">0.00%</td><td class="metric overall">3.28</td>
-                        <td class="metric sample">—</td><td class="metric sample">—</td>
+                        <td class="metric sample" data-en-exp="pretrain_50hz" data-metric="dwer">0.00%</td><td class="metric sample" data-en-exp="pretrain_50hz" data-metric="mos">3.66</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_50hz.wav')">&#9654; Play</button>
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
@@ -559,7 +559,7 @@
                         <td class="col-model"><strong>Pretrained FocalCodec 25Hz</strong></td>
                         <td>25Hz</td><td>325 bps</td>
                         <td class="metric overall">0.00%</td><td class="metric overall">3.61</td>
-                        <td class="metric sample">—</td><td class="metric sample">—</td>
+                        <td class="metric sample" data-en-exp="pretrain_25hz" data-metric="dwer">0.00%</td><td class="metric sample" data-en-exp="pretrain_25hz" data-metric="mos">3.71</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_25hz.wav')">&#9654; Play</button>
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
@@ -570,7 +570,7 @@
                         <td class="col-model"><strong>Pretrained FocalCodec 12.5Hz</strong></td>
                         <td>12.5Hz</td><td>163 bps</td>
                         <td class="metric overall">0.00%</td><td class="metric overall">3.61</td>
-                        <td class="metric sample">—</td><td class="metric sample">—</td>
+                        <td class="metric sample" data-en-exp="pretrain_12_5hz" data-metric="dwer">0.00%</td><td class="metric sample" data-en-exp="pretrain_12_5hz" data-metric="mos">3.15</td>
                         <td><div class="audio-cell"><div class="audio-player-wrap">
                             <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_12_5hz.wav')">&#9654; Play</button>
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
@@ -824,9 +824,12 @@ const CN_METRICS = {
         expI_s2:       { dcer: '0.00%',  mos: '3.01' },
         expJ_s2:       { dcer: '0.00%',  mos: '1.61' },
         expK_s3:       { dcer: '0.00%',  mos: '1.58' },
-        pretrain_s_2k: { dcer: '0.00%',  mos: '3.08' },
-        pretrain_s_4k: { dcer: '0.00%',  mos: '2.26' },
-        pretrain_s_65k:{ dcer: '0.00%',  mos: '3.06' },
+        pretrain_s_2k:  { dcer: '0.00%',  mos: '3.08' },
+        pretrain_s_4k:  { dcer: '0.00%',  mos: '2.26' },
+        pretrain_s_65k: { dcer: '0.00%',  mos: '3.06' },
+        pretrain_50hz:  { dcer: '0.00%',  mos: '3.08' },
+        pretrain_25hz:  { dcer: '0.00%',  mos: '2.84' },
+        pretrain_12_5hz:{ dcer: '0.00%',  mos: '3.26' },
     },
     'cn_best1': {
         expD_s2:       { dcer: '0.00%',  mos: '1.51' },
@@ -840,9 +843,12 @@ const CN_METRICS = {
         expI_s2:       { dcer: '0.00%',  mos: '2.56' },
         expJ_s2:       { dcer: '0.00%',  mos: '1.47' },
         expK_s3:       { dcer: '0.00%',  mos: '2.06' },
-        pretrain_s_2k: { dcer: '0.00%',  mos: '2.27' },
-        pretrain_s_4k: { dcer: '0.00%',  mos: '2.03' },
-        pretrain_s_65k:{ dcer: '0.00%',  mos: '2.01' },
+        pretrain_s_2k:  { dcer: '0.00%',  mos: '2.27' },
+        pretrain_s_4k:  { dcer: '0.00%',  mos: '2.03' },
+        pretrain_s_65k: { dcer: '0.00%',  mos: '2.01' },
+        pretrain_50hz:  { dcer: '0.00%',  mos: '2.52' },
+        pretrain_25hz:  { dcer: '13.33%', mos: '2.37' },
+        pretrain_12_5hz:{ dcer: '40.00%', mos: '1.70' },
     },
     'cn_best2': {
         expD_s2:       { dcer: '0.00%',  mos: '2.78' },
@@ -856,9 +862,12 @@ const CN_METRICS = {
         expI_s2:       { dcer: '0.00%',  mos: '3.53' },
         expJ_s2:       { dcer: '0.00%',  mos: '1.66' },
         expK_s3:       { dcer: '0.00%',  mos: '1.32' },
-        pretrain_s_2k: { dcer: '0.00%',  mos: '2.81' },
-        pretrain_s_4k: { dcer: '0.00%',  mos: '3.17' },
-        pretrain_s_65k:{ dcer: '0.00%',  mos: '3.09' },
+        pretrain_s_2k:  { dcer: '0.00%',  mos: '2.81' },
+        pretrain_s_4k:  { dcer: '0.00%',  mos: '3.17' },
+        pretrain_s_65k: { dcer: '0.00%',  mos: '3.09' },
+        pretrain_50hz:  { dcer: '0.00%',  mos: '3.55' },
+        pretrain_25hz:  { dcer: '0.00%',  mos: '3.35' },
+        pretrain_12_5hz:{ dcer: '63.64%', mos: '3.17' },
     },
     'cn_best3': {
         expD_s2:       { dcer: '0.00%',  mos: '2.52' },
@@ -872,9 +881,12 @@ const CN_METRICS = {
         expI_s2:       { dcer: '0.00%',  mos: '3.66' },
         expJ_s2:       { dcer: '0.00%',  mos: '1.57' },
         expK_s3:       { dcer: '0.00%',  mos: '2.01' },
-        pretrain_s_2k: { dcer: '0.00%',  mos: '3.12' },
-        pretrain_s_4k: { dcer: '0.00%',  mos: '2.91' },
-        pretrain_s_65k:{ dcer: '0.00%',  mos: '3.31' },
+        pretrain_s_2k:  { dcer: '0.00%',  mos: '3.12' },
+        pretrain_s_4k:  { dcer: '0.00%',  mos: '2.91' },
+        pretrain_s_65k: { dcer: '0.00%',  mos: '3.31' },
+        pretrain_50hz:  { dcer: '7.69%',  mos: '3.29' },
+        pretrain_25hz:  { dcer: '0.00%',  mos: '3.71' },
+        pretrain_12_5hz:{ dcer: '23.08%', mos: '2.95' },
     },
     'cn_worst1': {
         expD_s2:       { dcer: '21.43%', mos: '2.21' },
@@ -888,9 +900,12 @@ const CN_METRICS = {
         expI_s2:       { dcer: '28.57%', mos: '3.39' },
         expJ_s2:       { dcer: '28.57%', mos: '1.72' },
         expK_s3:       { dcer: '14.29%', mos: '1.58' },
-        pretrain_s_2k: { dcer: '21.43%', mos: '3.22' },
-        pretrain_s_4k: { dcer: '21.43%', mos: '3.08' },
-        pretrain_s_65k:{ dcer: '21.43%', mos: '3.21' },
+        pretrain_s_2k:  { dcer: '21.43%', mos: '3.22' },
+        pretrain_s_4k:  { dcer: '21.43%', mos: '3.08' },
+        pretrain_s_65k: { dcer: '21.43%', mos: '3.21' },
+        pretrain_50hz:  { dcer: '50.00%', mos: '3.68' },
+        pretrain_25hz:  { dcer: '28.57%', mos: '3.42' },
+        pretrain_12_5hz:{ dcer: '92.86%', mos: '3.49' },
     },
     'cn_worst2': {
         expD_s2:       { dcer: '10.00%', mos: '2.02' },
@@ -904,9 +919,12 @@ const CN_METRICS = {
         expI_s2:       { dcer: '30.00%', mos: '2.85' },
         expJ_s2:       { dcer: '10.00%', mos: '2.05' },
         expK_s3:       { dcer: '20.00%', mos: '2.55' },
-        pretrain_s_2k: { dcer: '20.00%', mos: '2.54' },
-        pretrain_s_4k: { dcer: '20.00%', mos: '2.43' },
-        pretrain_s_65k:{ dcer: '20.00%', mos: '2.34' },
+        pretrain_s_2k:  { dcer: '20.00%', mos: '2.54' },
+        pretrain_s_4k:  { dcer: '20.00%', mos: '2.43' },
+        pretrain_s_65k: { dcer: '20.00%', mos: '2.34' },
+        pretrain_50hz:  { dcer: '20.00%', mos: '2.76' },
+        pretrain_25hz:  { dcer: '20.00%', mos: '2.73' },
+        pretrain_12_5hz:{ dcer: '20.00%', mos: '2.32' },
     },
     'cn_worst3': {
         expD_s2:       { dcer: '13.33%', mos: '1.73' },
@@ -920,9 +938,12 @@ const CN_METRICS = {
         expI_s2:       { dcer: '13.33%', mos: '3.14' },
         expJ_s2:       { dcer: '13.33%', mos: '1.39' },
         expK_s3:       { dcer: '13.33%', mos: '1.42' },
-        pretrain_s_2k: { dcer: '33.33%', mos: '2.54' },
-        pretrain_s_4k: { dcer: '20.00%', mos: '2.13' },
-        pretrain_s_65k:{ dcer: '46.67%', mos: '2.40' },
+        pretrain_s_2k:  { dcer: '33.33%', mos: '2.54' },
+        pretrain_s_4k:  { dcer: '20.00%', mos: '2.13' },
+        pretrain_s_65k: { dcer: '46.67%', mos: '2.40' },
+        pretrain_50hz:  { dcer: '13.33%', mos: '2.45' },
+        pretrain_25hz:  { dcer: '13.33%', mos: '3.08' },
+        pretrain_12_5hz:{ dcer: '26.67%', mos: '3.17' },
     },
 };
 
@@ -938,9 +959,12 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.48' },
         expJ_s2:       { dwer: '0.00%',   mos: '2.23' },
         expK_s3:       { dwer: '9.52%',   mos: '1.44' },
-        pretrain_s_2k: { dwer: '0.00%',   mos: '3.01' },
-        pretrain_s_4k: { dwer: '0.00%',   mos: '2.65' },
-        pretrain_s_65k:{ dwer: '0.00%',   mos: '3.36' },
+        pretrain_s_2k:  { dwer: '0.00%',  mos: '3.01' },
+        pretrain_s_4k:  { dwer: '0.00%',  mos: '2.65' },
+        pretrain_s_65k: { dwer: '0.00%',  mos: '3.36' },
+        pretrain_50hz:  { dwer: '0.00%',  mos: '3.66' },
+        pretrain_25hz:  { dwer: '0.00%',  mos: '3.71' },
+        pretrain_12_5hz:{ dwer: '0.00%',  mos: '3.15' },
     },
     'en_best1': {
         expE_s1:       { dwer: '0.00%',   mos: '3.42' },
@@ -953,9 +977,12 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.31' },
         expJ_s2:       { dwer: '0.00%',   mos: '2.63' },
         expK_s3:       { dwer: '0.00%',   mos: '2.19' },
-        pretrain_s_2k: { dwer: '0.00%',   mos: '4.36' },
-        pretrain_s_4k: { dwer: '0.00%',   mos: '4.11' },
-        pretrain_s_65k:{ dwer: '0.00%',   mos: '4.20' },
+        pretrain_s_2k:  { dwer: '0.00%',  mos: '4.36' },
+        pretrain_s_4k:  { dwer: '0.00%',  mos: '4.11' },
+        pretrain_s_65k: { dwer: '0.00%',  mos: '4.20' },
+        pretrain_50hz:  { dwer: '0.00%',  mos: '3.99' },
+        pretrain_25hz:  { dwer: '0.00%',  mos: '3.68' },
+        pretrain_12_5hz:{ dwer: '0.00%',  mos: '3.55' },
     },
     'en_best2': {
         expE_s1:       { dwer: '0.00%',   mos: '3.27' },
@@ -968,9 +995,12 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.36' },
         expJ_s2:       { dwer: '0.00%',   mos: '2.13' },
         expK_s3:       { dwer: '0.00%',   mos: '2.12' },
-        pretrain_s_2k: { dwer: '0.00%',   mos: '3.28' },
-        pretrain_s_4k: { dwer: '0.00%',   mos: '3.76' },
-        pretrain_s_65k:{ dwer: '0.00%',   mos: '3.71' },
+        pretrain_s_2k:  { dwer: '0.00%',  mos: '3.28' },
+        pretrain_s_4k:  { dwer: '0.00%',  mos: '3.76' },
+        pretrain_s_65k: { dwer: '0.00%',  mos: '3.71' },
+        pretrain_50hz:  { dwer: '0.00%',  mos: '3.47' },
+        pretrain_25hz:  { dwer: '0.00%',  mos: '3.30' },
+        pretrain_12_5hz:{ dwer: '0.00%',  mos: '3.48' },
     },
     'en_best3': {
         expE_s1:       { dwer: '0.00%',   mos: '3.43' },
@@ -983,9 +1013,12 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.31' },
         expJ_s2:       { dwer: '0.00%',   mos: '2.26' },
         expK_s3:       { dwer: '0.00%',   mos: '1.84' },
-        pretrain_s_2k: { dwer: '0.00%',   mos: '4.01' },
-        pretrain_s_4k: { dwer: '0.00%',   mos: '4.02' },
-        pretrain_s_65k:{ dwer: '0.00%',   mos: '3.95' },
+        pretrain_s_2k:  { dwer: '0.00%',  mos: '4.01' },
+        pretrain_s_4k:  { dwer: '0.00%',  mos: '4.02' },
+        pretrain_s_65k: { dwer: '0.00%',  mos: '3.95' },
+        pretrain_50hz:  { dwer: '0.00%',  mos: '3.60' },
+        pretrain_25hz:  { dwer: '0.00%',  mos: '3.32' },
+        pretrain_12_5hz:{ dwer: '5.88%',  mos: '3.59' },
     },
     'en_worst1': {
         expE_s1:       { dwer: '13.51%',  mos: '3.48' },
@@ -998,9 +1031,12 @@ const EN_METRICS = {
         expI_s2:       { dwer: '16.22%',  mos: '3.32' },
         expJ_s2:       { dwer: '2.70%',   mos: '1.86' },
         expK_s3:       { dwer: '18.92%',  mos: '1.84' },
-        pretrain_s_2k: { dwer: '0.00%',   mos: '4.00' },
-        pretrain_s_4k: { dwer: '0.00%',   mos: '3.94' },
-        pretrain_s_65k:{ dwer: '0.00%',   mos: '4.06' },
+        pretrain_s_2k:  { dwer: '0.00%',  mos: '4.00' },
+        pretrain_s_4k:  { dwer: '0.00%',  mos: '3.94' },
+        pretrain_s_65k: { dwer: '0.00%',  mos: '4.06' },
+        pretrain_50hz:  { dwer: '0.00%',  mos: '4.10' },
+        pretrain_25hz:  { dwer: '0.00%',  mos: '4.12' },
+        pretrain_12_5hz:{ dwer: '0.00%',  mos: '3.86' },
     },
     'en_worst2': {
         expE_s1:       { dwer: '0.00%',   mos: '3.45' },
@@ -1013,9 +1049,12 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.53' },
         expJ_s2:       { dwer: '14.29%',  mos: '2.35' },
         expK_s3:       { dwer: '21.43%',  mos: '2.07' },
-        pretrain_s_2k: { dwer: '0.00%',   mos: '4.06' },
-        pretrain_s_4k: { dwer: '0.00%',   mos: '4.06' },
-        pretrain_s_65k:{ dwer: '0.00%',   mos: '3.65' },
+        pretrain_s_2k:  { dwer: '0.00%',  mos: '4.06' },
+        pretrain_s_4k:  { dwer: '0.00%',  mos: '4.06' },
+        pretrain_s_65k: { dwer: '0.00%',  mos: '3.65' },
+        pretrain_50hz:  { dwer: '0.00%',  mos: '3.99' },
+        pretrain_25hz:  { dwer: '0.00%',  mos: '4.00' },
+        pretrain_12_5hz:{ dwer: '0.00%',  mos: '3.65' },
     },
     'en_worst3': {
         expE_s1:       { dwer: '0.00%',   mos: '3.14' },
@@ -1028,9 +1067,12 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.62' },
         expJ_s2:       { dwer: '0.00%',   mos: '2.33' },
         expK_s3:       { dwer: '0.00%',   mos: '1.55' },
-        pretrain_s_2k: { dwer: '7.69%',   mos: '3.93' },
-        pretrain_s_4k: { dwer: '7.69%',   mos: '3.87' },
-        pretrain_s_65k:{ dwer: '7.69%',   mos: '3.91' },
+        pretrain_s_2k:  { dwer: '7.69%',  mos: '3.93' },
+        pretrain_s_4k:  { dwer: '7.69%',  mos: '3.87' },
+        pretrain_s_65k: { dwer: '7.69%',  mos: '3.91' },
+        pretrain_50hz:  { dwer: '7.69%',  mos: '3.11' },
+        pretrain_25hz:  { dwer: '7.69%',  mos: '3.41' },
+        pretrain_12_5hz:{ dwer: '7.69%',  mos: '3.34' },
     },
 };
 
