@@ -81,14 +81,48 @@
             background: #f0ecfa;
             border-top: 2px solid #764ba2;
             border-bottom: 2px solid #764ba2;
-            text-align: center;
+            text-align: left;
             padding: 10px 16px;
             font-size: 13px;
             color: #333;
-            line-height: 1.7;
+            line-height: 1.9;
         }
 
         tr.info-row td strong { color: #764ba2; }
+
+        /* sample selector row */
+        .sample-selector-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .sample-selector-row label {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .sample-select {
+            padding: 4px 10px;
+            border-radius: 5px;
+            border: 1.5px solid #764ba2;
+            background: white;
+            color: #333;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .sample-select:focus {
+            outline: none;
+            border-color: #5a3d9e;
+            box-shadow: 0 0 0 2px rgba(118,75,162,0.2);
+        }
+
+        .sample-meta {
+            font-size: 13px;
+            color: #333;
+        }
 
         /* ── Table ── */
         table {
@@ -129,12 +163,18 @@
 
         tbody tr:hover { background-color: #f5f0ff; }
 
-        /* ── Play button ── */
+        /* ── Audio player ── */
         .audio-cell {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+        }
+
+        .audio-player-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .play-button {
@@ -147,11 +187,56 @@
             font-size: 11px;
             font-weight: 600;
             white-space: nowrap;
+            min-width: 68px;
         }
 
         .play-button:hover   { background: #0056b3; }
         .play-button.playing { background: #28a745; }
         .play-button.playing:hover { background: #1e8436; }
+
+        /* volume slider */
+        .volume-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #555;
+        }
+
+        .volume-icon {
+            font-size: 13px;
+            user-select: none;
+        }
+
+        input[type="range"].volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 64px;
+            height: 4px;
+            border-radius: 2px;
+            background: #ccc;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"].volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: #764ba2;
+            cursor: pointer;
+        }
+
+        input[type="range"].volume-slider::-moz-range-thumb {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: #764ba2;
+            border: none;
+            cursor: pointer;
+        }
 
         .no-audio {
             color: #aaa;
@@ -172,7 +257,7 @@
             Chinese Demo — AISHELL-1 Test Set
         </div>
         <div class="dataset-section">
-            <table>
+            <table id="table-cn">
                 <thead>
                     <tr>
                         <th class="col-model">Model</th>
@@ -180,119 +265,273 @@
                         <th style="width:90px;">Bitrate</th>
                         <th style="width:80px;">dCER ↓</th>
                         <th style="width:80px;">MOS_Q ↑</th>
-                        <th style="width:120px;">Audio</th>
+                        <th style="width:160px;">Audio</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="info-row">
                         <td colspan="6">
-                            <strong>Sample:</strong> BAC009S0764W0121 &nbsp;|&nbsp;
-                            <strong>Speaker:</strong> S0764 &nbsp;|&nbsp;
-                            <strong>Duration:</strong> ~4.2s &nbsp;|&nbsp;
-                            <strong>Transcript:</strong> 甚至出现交易几乎停滞的情况
+                            <div class="sample-selector-row">
+                                <label><strong>Sample:</strong></label>
+                                <select class="sample-select" id="cn-sample-select" onchange="switchSampleCN(this.value)">
+                                    <option value="default">BAC009S0764W0121 (default)</option>
+                                    <optgroup label="Best Cases — All experiments perform well (low dCER)">
+                                        <option value="cn_best1">Best - 1 | BAC009S0769W0189</option>
+                                        <option value="cn_best2">Best - 2 | BAC009S0908W0212</option>
+                                        <option value="cn_best3">Best - 3 | BAC009S0916W0131</option>
+                                    </optgroup>
+                                    <optgroup label="Worst Cases — All experiments perform poorly (high dCER)">
+                                        <option value="cn_worst1">Worst - 1 | BAC009S0912W0476</option>
+                                        <option value="cn_worst2">Worst - 2 | BAC009S0903W0166</option>
+                                        <option value="cn_worst3">Worst - 3 | BAC009S0768W0210</option>
+                                    </optgroup>
+                                </select>
+                                <span class="sample-meta" id="cn-sample-meta">
+                                    <strong>File Name:</strong> BAC009S0764W0121 &nbsp;|&nbsp;
+                                    <strong>Speaker:</strong> S0764 &nbsp;|&nbsp;
+                                    <strong>Duration:</strong> ~4.2s &nbsp;|&nbsp;
+                                    <strong>Transcript:</strong> 甚至出现交易几乎停滞的情况
+                                </span>
+                            </div>
                         </td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Original</strong></td>
                         <td>—</td><td>—</td><td>—</td><td>—</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/original.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="cn-original">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getCNAudio('original', 'original.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec 50Hz</strong></td>
                         <td>50Hz</td><td>650 bps</td><td>0.00%</td><td>2.34</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_50hz.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_50hz.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec 25Hz</strong></td>
                         <td>25Hz</td><td>325 bps</td><td>0.00%</td><td>2.43</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_25hz.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_25hz.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec 12.5Hz</strong></td>
                         <td>12.5Hz</td><td>163 bps</td><td>46.15%</td><td>2.83</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_12_5hz.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_12_5hz.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 2k</strong></td>
                         <td>50Hz</td><td>550 bps</td><td>15.38%</td><td>2.51</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_2k.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_2k.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 4k</strong></td>
                         <td>50Hz</td><td>600 bps</td><td>30.77%</td><td>2.46</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_4k.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_4k.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 65k</strong></td>
                         <td>50Hz</td><td>800 bps</td><td>15.38%</td><td>2.62</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_65k.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/cn/focalcodec_s_65k.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp D — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>7.7%</td><td>—</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_D_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_D_stage2.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp E — Stage 1</strong></td>
                         <td>50Hz</td><td>550 bps</td><td>6.17%</td><td>2.96</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage1.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage1.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp E — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>13.3%</td><td>2.74</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="cn-exp-E-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getCNAudio('exp_E', 'exp_E_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp E — Stage 3</strong></td>
                         <td>12.5Hz</td><td>137.5 bps</td><td>43.6%</td><td>2.42</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage3.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_E_stage3.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp F — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>14.5%</td><td>2.68</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_F_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="cn-exp-F-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getCNAudio('exp_F', 'exp_F_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp G — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>17.4%</td><td>2.65</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_G_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="cn-exp-G-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getCNAudio('exp_G', 'exp_G_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp H — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>16.4%</td><td>2.71</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_H_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="cn-exp-H-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getCNAudio('exp_H', 'exp_H_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp I — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>16.6%</td><td>2.95</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_I_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="cn-exp-I-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getCNAudio('exp_I', 'exp_I_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong></td>
+                        <td class="col-model"><strong>Exp J — Stage 2 &#11088;</strong></td>
                         <td>25Hz</td><td>275 bps</td><td><strong>4.15%</strong></td><td>1.59</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_J_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="cn-exp-J-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getCNAudio('exp_J', 'exp_J_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp K — Stage 3</strong></td>
                         <td>12.5Hz</td><td>137.5 bps</td><td>16.0%</td><td>1.33</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/cn/exp_K_stage3.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/cn/exp_K_stage3.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
                 </tbody>
             </table>
@@ -305,7 +544,7 @@
             English Demo — LibriSpeech test-clean
         </div>
         <div class="dataset-section">
-            <table>
+            <table id="table-en">
                 <thead>
                     <tr>
                         <th class="col-model">Model</th>
@@ -313,113 +552,257 @@
                         <th style="width:90px;">Bitrate</th>
                         <th style="width:80px;">dWER ↓</th>
                         <th style="width:80px;">MOS_Q ↑</th>
-                        <th style="width:120px;">Audio</th>
+                        <th style="width:160px;">Audio</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="info-row">
                         <td colspan="6">
-                            <strong>Sample:</strong> 61-70968-0000 &nbsp;|&nbsp;
-                            <strong>Speaker:</strong> 61 &nbsp;|&nbsp;
-                            <strong>Duration:</strong> ~4.9s &nbsp;|&nbsp;
-                            <strong>Transcript:</strong> "He began a confused complaint against the wizard who had vanished behind the curtain on the left."
+                            <div class="sample-selector-row">
+                                <label><strong>Sample:</strong></label>
+                                <select class="sample-select" id="en-sample-select" onchange="switchSampleEN(this.value)">
+                                    <option value="default">61-70968-0000 (default)</option>
+                                    <optgroup label="Best Cases — All experiments perform well (low dWER)">
+                                        <option value="en_best1">Best - 1 | 4992-41797-0010</option>
+                                        <option value="en_best2">Best - 2 | 1284-1180-0016</option>
+                                    </optgroup>
+                                    <optgroup label="Worst Cases — All experiments perform poorly (high dWER)">
+                                        <option value="en_worst1">Worst - 1 | 237-134493-0007</option>
+                                        <option value="en_worst2">Worst - 2 | 6829-68769-0012</option>
+                                    </optgroup>
+                                </select>
+                                <span class="sample-meta" id="en-sample-meta">
+                                    <strong>File Name:</strong> 61-70968-0000 &nbsp;|&nbsp;
+                                    <strong>Speaker:</strong> 61 &nbsp;|&nbsp;
+                                    <strong>Duration:</strong> ~4.9s &nbsp;|&nbsp;
+                                    <strong>Transcript:</strong> "He began a confused complaint against the wizard who had vanished behind the curtain on the left."
+                                </span>
+                            </div>
                         </td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Original</strong></td>
                         <td>—</td><td>—</td><td>—</td><td>—</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/original.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="en-original">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getENAudio('original', 'original.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec 50Hz</strong></td>
                         <td>50Hz</td><td>650 bps</td><td>0.00%</td><td>3.28</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_50hz.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_50hz.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec 25Hz</strong></td>
                         <td>25Hz</td><td>325 bps</td><td>0.00%</td><td>3.61</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_25hz.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_25hz.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec 12.5Hz</strong></td>
                         <td>12.5Hz</td><td>163 bps</td><td>0.00%</td><td>3.61</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_12_5hz.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_12_5hz.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 2k</strong></td>
                         <td>50Hz</td><td>550 bps</td><td>0.00%</td><td>2.64</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_2k.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_2k.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 4k</strong></td>
                         <td>50Hz</td><td>600 bps</td><td>0.00%</td><td>2.78</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_4k.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_4k.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Pretrained FocalCodec-S 50Hz 65k</strong></td>
                         <td>50Hz</td><td>800 bps</td><td>0.00%</td><td>3.34</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_65k.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/pretrained/en/focalcodec_s_65k.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp E — Stage 1</strong></td>
                         <td>50Hz</td><td>550 bps</td><td>3.87%</td><td>3.32</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage1.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage1.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp E — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>30.6%</td><td>2.95</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="en-exp-E-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getENAudio('exp_E', 'exp_E_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp E — Stage 3</strong></td>
                         <td>12.5Hz</td><td>137.5 bps</td><td>96.2%</td><td>2.51</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage3.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/en/exp_E_stage3.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp F — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>27.7%</td><td>2.82</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_F_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="en-exp-F-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getENAudio('exp_F', 'exp_F_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp G — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>10.1%</td><td>3.02</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_G_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="en-exp-G-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getENAudio('exp_G', 'exp_G_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp H — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>11.8%</td><td>3.07</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_H_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="en-exp-H-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getENAudio('exp_H', 'exp_H_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp I — Stage 2</strong></td>
                         <td>25Hz</td><td>275 bps</td><td>11.3%</td><td>3.31</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_I_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="en-exp-I-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getENAudio('exp_I', 'exp_I_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp J — Stage 2 ⭐</strong></td>
+                        <td class="col-model"><strong>Exp J — Stage 2 &#11088;</strong></td>
                         <td>25Hz</td><td>275 bps</td><td><strong>3.02%</strong></td><td>2.00</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_J_stage2.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell" id="en-exp-J-stage2">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this, getENAudio('exp_J', 'exp_J_stage2.wav'))">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
 
                     <tr>
                         <td class="col-model"><strong>Exp K — Stage 3</strong></td>
                         <td>12.5Hz</td><td>137.5 bps</td><td>10.0%</td><td>1.44</td>
-                        <td><div class="audio-cell"><button class="play-button" onclick="togglePlay(this,'audio/en/exp_K_stage3.wav')">▶ Play</button></div></td>
+                        <td><div class="audio-cell">
+                            <div class="audio-player-wrap">
+                                <button class="play-button" onclick="togglePlay(this,'audio/en/exp_K_stage3.wav')">&#9654; Play</button>
+                                <div class="volume-wrap">
+                                    <span class="volume-icon">&#128266;</span>
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)">
+                                </div>
+                            </div>
+                        </div></td>
                     </tr>
                 </tbody>
             </table>
@@ -429,6 +812,7 @@
 </div><!-- /container -->
 
 <script>
+    // ── Audio playback ──────────────────────────────────────────────
     let currentAudio = null;
     let currentBtn   = null;
 
@@ -449,13 +833,18 @@
         }
 
         const audio = new Audio(src);
+
+        // apply volume from the slider next to this button
+        const slider = btn.closest('.audio-player-wrap').querySelector('.volume-slider');
+        if (slider) audio.volume = parseFloat(slider.value);
+
         audio.play().catch(() => {
             alert('Could not load audio: ' + src);
             resetBtn(btn);
         });
 
         btn.classList.add('playing');
-        btn.textContent = '⏹ Stop';
+        btn.innerHTML = '&#9632; Stop';
         currentAudio = audio;
         currentBtn   = btn;
 
@@ -468,7 +857,146 @@
 
     function resetBtn(btn) {
         btn.classList.remove('playing');
-        btn.textContent = '▶ Play';
+        btn.innerHTML = '&#9654; Play';
+    }
+
+    function setVolume(slider) {
+        // adjust volume of currently playing audio if it belongs to this slider
+        if (currentAudio && currentBtn) {
+            const wrap = currentBtn.closest('.audio-player-wrap');
+            if (wrap && wrap.querySelector('.volume-slider') === slider) {
+                currentAudio.volume = parseFloat(slider.value);
+            }
+        }
+    }
+
+    // ── Sample metadata lookup ──────────────────────────────────────
+    const CN_SAMPLES = {
+        'default': {
+            dir: 'audio/cn',
+            meta: '<strong>File Name:</strong> BAC009S0764W0121 &nbsp;|&nbsp;<strong>Speaker:</strong> S0764 &nbsp;|&nbsp;<strong>Duration:</strong> ~4.2s &nbsp;|&nbsp;<strong>Transcript:</strong> 甚至出现交易几乎停滞的情况'
+        },
+        'cn_best1': {
+            dir: 'audio/cn_best1',
+            meta: '<strong>File Name:</strong> BAC009S0769W0189 &nbsp;|&nbsp;<strong>Speaker:</strong> S0769 &nbsp;|&nbsp;<strong>Duration:</strong> ~4.1s &nbsp;|&nbsp;<strong>Transcript:</strong> 发行利率也有较大幅度上升 &nbsp;<span style="color:#28a745;font-weight:bold;">[Best - 1: All exps low dCER]</span>'
+        },
+        'cn_best2': {
+            dir: 'audio/cn_best2',
+            meta: '<strong>File Name:</strong> BAC009S0908W0212 &nbsp;|&nbsp;<strong>Speaker:</strong> S0908 &nbsp;|&nbsp;<strong>Duration:</strong> ~5.3s &nbsp;|&nbsp;<strong>Transcript:</strong> 逐步建立城乡统一的公共服务制度 &nbsp;<span style="color:#28a745;font-weight:bold;">[Best - 2: All exps low dCER]</span>'
+        },
+        'cn_best3': {
+            dir: 'audio/cn_best3',
+            meta: '<strong>File Name:</strong> BAC009S0916W0131 &nbsp;|&nbsp;<strong>Speaker:</strong> S0916 &nbsp;|&nbsp;<strong>Duration:</strong> ~3.1s &nbsp;|&nbsp;<strong>Transcript:</strong> 一智能产品的安全 &nbsp;<span style="color:#28a745;font-weight:bold;">[Best - 3: All exps low dCER]</span>'
+        },
+        'cn_worst1': {
+            dir: 'audio/cn_worst1',
+            meta: '<strong>File Name:</strong> BAC009S0912W0476 &nbsp;|&nbsp;<strong>Speaker:</strong> S0912 &nbsp;|&nbsp;<strong>Duration:</strong> ~3.6s &nbsp;|&nbsp;<strong>Transcript:</strong> 被餐厅罚款二四零零元 &nbsp;<span style="color:#dc3545;font-weight:bold;">[Worst - 1: All exps high dCER]</span>'
+        },
+        'cn_worst2': {
+            dir: 'audio/cn_worst2',
+            meta: '<strong>File Name:</strong> BAC009S0903W0166 &nbsp;|&nbsp;<strong>Speaker:</strong> S0903 &nbsp;|&nbsp;<strong>Duration:</strong> ~3.2s &nbsp;|&nbsp;<strong>Transcript:</strong> 回升势头有转弱的迹象 &nbsp;<span style="color:#dc3545;font-weight:bold;">[Worst - 2: All exps high dCER]</span>'
+        },
+        'cn_worst3': {
+            dir: 'audio/cn_worst3',
+            meta: '<strong>File Name:</strong> BAC009S0768W0210 &nbsp;|&nbsp;<strong>Speaker:</strong> S0768 &nbsp;|&nbsp;<strong>Duration:</strong> ~6.7s &nbsp;|&nbsp;<strong>Transcript:</strong> 徐林吸取欧美等国主权债务危机的教训 &nbsp;<span style="color:#dc3545;font-weight:bold;">[Worst - 3: All exps high dCER]</span>'
+        }
+    };
+
+    const EN_SAMPLES = {
+        'default': {
+            dir: 'audio/en',
+            meta: '<strong>File Name:</strong> 61-70968-0000 &nbsp;|&nbsp;<strong>Speaker:</strong> 61 &nbsp;|&nbsp;<strong>Duration:</strong> ~4.9s &nbsp;|&nbsp;<strong>Transcript:</strong> "He began a confused complaint against the wizard who had vanished behind the curtain on the left."'
+        },
+        'en_best1': {
+            dir: 'audio/en_best1',
+            meta: '<strong>File Name:</strong> 4992-41797-0010 &nbsp;|&nbsp;<strong>Speaker:</strong> 4992 &nbsp;|&nbsp;<strong>Duration:</strong> ~6.8s &nbsp;|&nbsp;<strong>Transcript:</strong> "Always irritable cold indifferent he had grown rapidly more so as years went on." &nbsp;<span style="color:#28a745;font-weight:bold;">[Best - 1: All exps low dWER]</span>'
+        },
+        'en_best2': {
+            dir: 'audio/en_best2',
+            meta: '<strong>File Name:</strong> 1284-1180-0016 &nbsp;|&nbsp;<strong>Speaker:</strong> 1284 &nbsp;|&nbsp;<strong>Duration:</strong> ~2.2s &nbsp;|&nbsp;<strong>Transcript:</strong> "The woman seemed thoughtful." &nbsp;<span style="color:#28a745;font-weight:bold;">[Best - 2: All exps low dWER]</span>'
+        },
+        'en_worst1': {
+            dir: 'audio/en_worst1',
+            meta: '<strong>File Name:</strong> 237-134493-0007 &nbsp;|&nbsp;<strong>Speaker:</strong> 237 &nbsp;|&nbsp;<strong>Duration:</strong> ~2.0s &nbsp;|&nbsp;<strong>Transcript:</strong> "Alexandra lets you sleep late." &nbsp;<span style="color:#dc3545;font-weight:bold;">[Worst - 1: All exps high dWER]</span>'
+        },
+        'en_worst2': {
+            dir: 'audio/en_worst2',
+            meta: '<strong>File Name:</strong> 6829-68769-0012 &nbsp;|&nbsp;<strong>Speaker:</strong> 6829 &nbsp;|&nbsp;<strong>Duration:</strong> ~4.3s &nbsp;|&nbsp;<strong>Transcript:</strong> "Oh say that\'s different observed Markham altering his demeanor." &nbsp;<span style="color:#dc3545;font-weight:bold;">[Worst - 2: All exps high dWER]</span>'
+        }
+    };
+
+    // Current selected sample dir
+    let currentCNSample = 'default';
+    let currentENSample = 'default';
+
+    // Map from exp key to filename in each sample dir
+    const CN_EXP_FILES = {
+        'original': 'original.wav',
+        'exp_E':    'exp_E_stage2.wav',
+        'exp_F':    'exp_F_stage2.wav',
+        'exp_G':    'exp_G_stage2.wav',
+        'exp_H':    'exp_H_stage2.wav',
+        'exp_I':    'exp_I_stage2.wav',
+        'exp_J':    'exp_J_stage2.wav',
+    };
+
+    const EN_EXP_FILES = {
+        'original': 'original.wav',
+        'exp_E':    'exp_E_stage2.wav',
+        'exp_F':    'exp_F_stage2.wav',
+        'exp_G':    'exp_G_stage2.wav',
+        'exp_H':    'exp_H_stage2.wav',
+        'exp_I':    'exp_I_stage2.wav',
+        'exp_J':    'exp_J_stage2.wav',
+    };
+
+    // For default sample, original is in audio/cn or audio/en (with different filenames)
+    const CN_DEFAULT_ORIG = 'audio/cn/original.wav';
+    const EN_DEFAULT_ORIG = 'audio/en/original.wav';
+
+    function getCNAudio(expKey, defaultFile) {
+        if (currentCNSample === 'default') {
+            if (expKey === 'original') return CN_DEFAULT_ORIG;
+            return 'audio/cn/' + defaultFile;
+        }
+        const dir = CN_SAMPLES[currentCNSample].dir;
+        return dir + '/' + CN_EXP_FILES[expKey];
+    }
+
+    function getENAudio(expKey, defaultFile) {
+        if (currentENSample === 'default') {
+            if (expKey === 'original') return EN_DEFAULT_ORIG;
+            return 'audio/en/' + defaultFile;
+        }
+        const dir = EN_SAMPLES[currentENSample].dir;
+        const fname = EN_EXP_FILES[expKey];
+        // en_best1/en_worst1 etc. use .wav for original inference but .flac for original
+        if (expKey === 'original') {
+            return dir + '/original.flac';
+        }
+        return dir + '/' + fname;
+    }
+
+    function stopCurrentAudio() {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            if (currentBtn) resetBtn(currentBtn);
+            currentAudio = null;
+            currentBtn = null;
+        }
+    }
+
+    function switchSampleCN(val) {
+        stopCurrentAudio();
+        currentCNSample = val;
+        document.getElementById('cn-sample-meta').innerHTML = CN_SAMPLES[val].meta;
+    }
+
+    function switchSampleEN(val) {
+        stopCurrentAudio();
+        currentENSample = val;
+        document.getElementById('en-sample-meta').innerHTML = EN_SAMPLES[val].meta;
     }
 </script>
 
