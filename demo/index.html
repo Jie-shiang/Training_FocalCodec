@@ -518,6 +518,18 @@
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
                         </div></div></td>
                     </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>Focal expO (v9+v6, ep28)</strong></td>
+                        <td>25Hz</td><td>550 bps</td>
+                        <td class="metric overall">12.92%</td><td class="metric overall">2.64</td>
+                        <td class="metric sample" data-cn-exp="expO_v9_v6_ep28" data-metric="dcer">0.00%</td>
+                        <td class="metric sample" data-cn-exp="expO_v9_v6_ep28" data-metric="mos">2.37</td>
+                        <td><div class="audio-cell"><div class="audio-player-wrap">
+                            <button class="play-button cn-audio" data-exp="expO_v9_v6_ep28" onclick="togglePlay(this, getCNAudio('expO_v9_v6_ep28'))">&#9654; Play</button>
+                            <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
+                        </div></div></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -801,6 +813,18 @@
                             <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
                         </div></div></td>
                     </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>Focal expO (v9+v6, ep28)</strong></td>
+                        <td>25Hz</td><td>550 bps</td>
+                        <td class="metric overall">9.96%</td><td class="metric overall">3.11</td>
+                        <td class="metric sample" data-en-exp="expO_v9_v6_ep28" data-metric="dwer">0.00%</td>
+                        <td class="metric sample" data-en-exp="expO_v9_v6_ep28" data-metric="mos">3.66</td>
+                        <td><div class="audio-cell"><div class="audio-player-wrap">
+                            <button class="play-button en-audio" data-exp="expO_v9_v6_ep28" onclick="togglePlay(this, getENAudio('expO_v9_v6_ep28'))">&#9654; Play</button>
+                            <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
+                        </div></div></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -905,6 +929,7 @@ const CN_METRICS = {
         focalV6:        { dcer: '0.00%',  mos: '1.60' },
         focalV6_24k:    { dcer: '0.00%',  mos: '2.30' },
         focalSem6bit:   { dcer: '0.00%',  mos: '1.34' },
+        expO_v9_v6_ep28:{ dcer: '0.00%',  mos: '2.37' },
     },
     'cn_best1': {
         expD_s2:       { dcer: '0.00%',  mos: '1.51' },
@@ -927,6 +952,7 @@ const CN_METRICS = {
         focalV6:        { dcer: '0.00%',  mos: '1.71' },
         focalV6_24k:    { dcer: '0.00%',  mos: '2.06' },
         focalSem6bit:   { dcer: '6.67%',  mos: '1.44' },
+        expO_v9_v6_ep28:{ dcer: '20.00%', mos: '1.78' },
     },
     'cn_best2': {
         expD_s2:       { dcer: '0.00%',  mos: '2.78' },
@@ -949,6 +975,7 @@ const CN_METRICS = {
         focalV6:        { dcer: '0.00%',  mos: '1.66' },
         focalV6_24k:    { dcer: '0.00%',  mos: '1.98' },
         focalSem6bit:   { dcer: '0.00%',  mos: '1.41' },
+        expO_v9_v6_ep28:{ dcer: '0.00%',  mos: '3.35' },
     },
     'cn_best3': {
         expD_s2:       { dcer: '0.00%',  mos: '2.52' },
@@ -971,6 +998,7 @@ const CN_METRICS = {
         focalV6:        { dcer: '0.00%',  mos: '2.28' },
         focalV6_24k:    { dcer: '7.69%',  mos: '1.48' },
         focalSem6bit:   { dcer: '0.00%',  mos: '1.46' },
+        expO_v9_v6_ep28:{ dcer: '0.00%',  mos: '2.98' },
     },
     'cn_worst1': {
         expD_s2:       { dcer: '21.43%', mos: '2.21' },
@@ -993,6 +1021,7 @@ const CN_METRICS = {
         focalV6:        { dcer: '28.57%', mos: '2.08' },
         focalV6_24k:    { dcer: '92.86%', mos: '1.76' },
         focalSem6bit:   { dcer: '50.00%', mos: '1.23' },
+        expO_v9_v6_ep28:{ dcer: '14.29%', mos: '2.44' },
     },
     'cn_worst2': {
         expD_s2:       { dcer: '10.00%', mos: '2.02' },
@@ -1015,6 +1044,7 @@ const CN_METRICS = {
         focalV6:        { dcer: '10.00%', mos: '1.71' },
         focalV6_24k:    { dcer: '20.00%', mos: '2.23' },
         focalSem6bit:   { dcer: '80.00%', mos: '1.17' },
+        expO_v9_v6_ep28:{ dcer: '20.00%', mos: '2.45' },
     },
     'cn_worst3': {
         expD_s2:       { dcer: '13.33%', mos: '1.73' },
@@ -1037,6 +1067,7 @@ const CN_METRICS = {
         focalV6:        { dcer: '13.33%', mos: '1.28' },
         focalV6_24k:    { dcer: '33.33%', mos: '1.35' },
         focalSem6bit:   { dcer: '20.00%', mos: '1.17' },
+        expO_v9_v6_ep28:{ dcer: '20.00%', mos: '2.24' },
     },
 };
 
@@ -1061,6 +1092,7 @@ const EN_METRICS = {
         focalV6:        { dwer: '0.00%',  mos: '2.09' },
         focalV6_24k:    { dwer: '0.00%',  mos: '2.58' },
         focalSem6bit:   { dwer: '4.76%',  mos: '1.08' },
+        expO_v9_v6_ep28:{ dwer: '0.00%',  mos: '3.66' },
     },
     'en_best1': {
         expE_s1:       { dwer: '0.00%',   mos: '3.42' },
@@ -1082,6 +1114,7 @@ const EN_METRICS = {
         focalV6:        { dwer: '0.00%',  mos: '2.41' },
         focalV6_24k:    { dwer: '0.00%',  mos: '2.70' },
         focalSem6bit:   { dwer: '0.00%',  mos: '1.36' },
+        expO_v9_v6_ep28:{ dwer: '0.00%',  mos: '3.92' },
     },
     'en_best2': {
         expE_s1:       { dwer: '0.00%',   mos: '3.27' },
@@ -1103,6 +1136,7 @@ const EN_METRICS = {
         focalV6:        { dwer: '0.00%',  mos: '1.84' },
         focalV6_24k:    { dwer: '0.00%',  mos: '2.26' },
         focalSem6bit:   { dwer: '0.00%',  mos: '1.01' },
+        expO_v9_v6_ep28:{ dwer: '0.00%',  mos: '2.83' },
     },
     'en_best3': {
         expE_s1:       { dwer: '0.00%',   mos: '3.43' },
@@ -1124,6 +1158,7 @@ const EN_METRICS = {
         focalV6:        { dwer: '0.00%',  mos: '2.17' },
         focalV6_24k:    { dwer: '0.00%',  mos: '2.66' },
         focalSem6bit:   { dwer: '0.00%',  mos: '1.29' },
+        expO_v9_v6_ep28:{ dwer: '0.00%',  mos: '3.16' },
     },
     'en_worst1': {
         expE_s1:       { dwer: '13.51%',  mos: '3.48' },
@@ -1145,6 +1180,7 @@ const EN_METRICS = {
         focalV6:        { dwer: '0.00%',  mos: '2.28' },
         focalV6_24k:    { dwer: '2.70%',  mos: '2.18' },
         focalSem6bit:   { dwer: '13.51%', mos: '1.36' },
+        expO_v9_v6_ep28:{ dwer: '10.81%', mos: '3.22' },
     },
     'en_worst2': {
         expE_s1:       { dwer: '0.00%',   mos: '3.45' },
@@ -1166,6 +1202,7 @@ const EN_METRICS = {
         focalV6:        { dwer: '0.00%',  mos: '2.21' },
         focalV6_24k:    { dwer: '0.00%',  mos: '2.23' },
         focalSem6bit:   { dwer: '0.00%',  mos: '1.16' },
+        expO_v9_v6_ep28:{ dwer: '7.14%',  mos: '3.99' },
     },
     'en_worst3': {
         expE_s1:       { dwer: '0.00%',   mos: '3.14' },
@@ -1187,6 +1224,7 @@ const EN_METRICS = {
         focalV6:        { dwer: '-7.69%', mos: '2.38' },
         focalV6_24k:    { dwer: '-7.69%', mos: '3.08' },
         focalSem6bit:   { dwer: '0.00%',  mos: '1.41' },
+        expO_v9_v6_ep28:{ dwer: '0.00%',  mos: '2.40' },
     },
 };
 
@@ -1201,21 +1239,22 @@ const CN_AUDIO_DIRS = {
     'cn_worst3': 'audio/cn_worst3',
 };
 const CN_EXP_FILES = {
-    original:    'original.wav',
-    expD_s2:     'exp_D_stage2.wav',
-    expE_s1:     'exp_E_stage1.wav',
-    expE_s2:     'exp_E_stage2.wav',
-    expE_s3:     'exp_E_stage3.wav',
-    expF_s2:     'exp_F_stage2.wav',
-    expF_s3:     'exp_F_stage3.wav',
-    expG_s2:     'exp_G_stage2.wav',
-    expH_s2:     'exp_H_stage2.wav',
-    expI_s2:     'exp_I_stage2.wav',
-    expJ_s2:     'exp_J_stage2.wav',
-    expK_s3:     'exp_K_stage3.wav',
-    focalV6:     'focal_v6.wav',
-    focalV6_24k: 'focal_v6_24k.wav',
-    focalSem6bit:'focal_sem_6bit.wav',
+    original:        'original.wav',
+    expD_s2:         'exp_D_stage2.wav',
+    expE_s1:         'exp_E_stage1.wav',
+    expE_s2:         'exp_E_stage2.wav',
+    expE_s3:         'exp_E_stage3.wav',
+    expF_s2:         'exp_F_stage2.wav',
+    expF_s3:         'exp_F_stage3.wav',
+    expG_s2:         'exp_G_stage2.wav',
+    expH_s2:         'exp_H_stage2.wav',
+    expI_s2:         'exp_I_stage2.wav',
+    expJ_s2:         'exp_J_stage2.wav',
+    expK_s3:         'exp_K_stage3.wav',
+    focalV6:         'focal_v6.wav',
+    focalV6_24k:     'focal_v6_24k.wav',
+    focalSem6bit:    'focal_sem_6bit.wav',
+    expO_v9_v6_ep28: 'focal_expO_v9_v6_ep28.wav',
 };
 
 const EN_AUDIO_DIRS = {
@@ -1228,20 +1267,21 @@ const EN_AUDIO_DIRS = {
     'en_worst3': 'audio/en_worst3',
 };
 const EN_EXP_FILES = {
-    original:    'original.flac',
-    expE_s1:     'exp_E_stage1.wav',
-    expE_s2:     'exp_E_stage2.wav',
-    expE_s3:     'exp_E_stage3.wav',
-    expF_s2:     'exp_F_stage2.wav',
-    expF_s3:     'exp_F_stage3.wav',
-    expG_s2:     'exp_G_stage2.wav',
-    expH_s2:     'exp_H_stage2.wav',
-    expI_s2:     'exp_I_stage2.wav',
-    expJ_s2:     'exp_J_stage2.wav',
-    expK_s3:     'exp_K_stage3.wav',
-    focalV6:     'focal_v6.wav',
-    focalV6_24k: 'focal_v6_24k.wav',
-    focalSem6bit:'focal_sem_6bit.wav',
+    original:        'original.flac',
+    expE_s1:         'exp_E_stage1.wav',
+    expE_s2:         'exp_E_stage2.wav',
+    expE_s3:         'exp_E_stage3.wav',
+    expF_s2:         'exp_F_stage2.wav',
+    expF_s3:         'exp_F_stage3.wav',
+    expG_s2:         'exp_G_stage2.wav',
+    expH_s2:         'exp_H_stage2.wav',
+    expI_s2:         'exp_I_stage2.wav',
+    expJ_s2:         'exp_J_stage2.wav',
+    expK_s3:         'exp_K_stage3.wav',
+    focalV6:         'focal_v6.wav',
+    focalV6_24k:     'focal_v6_24k.wav',
+    focalSem6bit:    'focal_sem_6bit.wav',
+    expO_v9_v6_ep28: 'focal_expO_v9_v6_ep28.wav',
 };
 
 let currentCNSample = 'default';
