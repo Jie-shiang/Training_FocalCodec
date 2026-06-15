@@ -484,8 +484,20 @@
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp O</strong></td>
-                        <td>25Hz</td><td>550 bps</td>
+                        <td class="col-model"><strong>Exp M — Stage 3</strong></td>
+                        <td>12.5Hz</td><td>137.5 bps</td>
+                        <td class="metric overall">49.58%</td><td class="metric overall">2.45</td>
+                        <td class="metric sample" data-cn-exp="expM_s3" data-metric="dcer">0.00%</td>
+                        <td class="metric sample" data-cn-exp="expM_s3" data-metric="mos">2.20</td>
+                        <td><div class="audio-cell"><div class="audio-player-wrap">
+                            <button class="play-button cn-audio" data-exp="expM_s3" onclick="togglePlay(this, getCNAudio('expM_s3'))">&#9654; Play</button>
+                            <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
+                        </div></div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>Exp O — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td>
                         <td class="metric overall">12.92%</td><td class="metric overall">2.64</td>
                         <td class="metric sample" data-cn-exp="expO_v9_v6_ep28" data-metric="dcer">0.00%</td>
                         <td class="metric sample" data-cn-exp="expO_v9_v6_ep28" data-metric="mos">2.37</td>
@@ -779,8 +791,20 @@
                     </tr>
 
                     <tr>
-                        <td class="col-model"><strong>Exp O</strong></td>
-                        <td>25Hz</td><td>550 bps</td>
+                        <td class="col-model"><strong>Exp M — Stage 3</strong></td>
+                        <td>12.5Hz</td><td>137.5 bps</td>
+                        <td class="metric overall">44.13%</td><td class="metric overall">2.61</td>
+                        <td class="metric sample" data-en-exp="expM_s3" data-metric="dwer">0.00%</td>
+                        <td class="metric sample" data-en-exp="expM_s3" data-metric="mos">3.00</td>
+                        <td><div class="audio-cell"><div class="audio-player-wrap">
+                            <button class="play-button en-audio" data-exp="expM_s3" onclick="togglePlay(this, getENAudio('expM_s3'))">&#9654; Play</button>
+                            <div class="volume-wrap"><span>&#128266;</span><input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this)"></div>
+                        </div></div></td>
+                    </tr>
+
+                    <tr>
+                        <td class="col-model"><strong>Exp O — Stage 2</strong></td>
+                        <td>25Hz</td><td>275 bps</td>
                         <td class="metric overall">9.96%</td><td class="metric overall">3.11</td>
                         <td class="metric sample" data-en-exp="expO_v9_v6_ep28" data-metric="dwer">0.00%</td>
                         <td class="metric sample" data-en-exp="expO_v9_v6_ep28" data-metric="mos">3.66</td>
@@ -920,6 +944,7 @@ const CN_METRICS = {
         expI_s2:       { dcer: '0.00%',  mos: '3.01' },
         expJ_s2:       { dcer: '0.00%',  mos: '1.61' },
         expK_s3:       { dcer: '0.00%',  mos: '1.58' },
+        expM_s3:       { dcer: '0.00%',  mos: '2.20' },
         pretrain_s_2k:  { dcer: '0.00%',  mos: '3.08' },
         pretrain_s_4k:  { dcer: '0.00%',  mos: '2.26' },
         pretrain_s_65k: { dcer: '0.00%',  mos: '3.06' },
@@ -943,6 +968,7 @@ const CN_METRICS = {
         expI_s2:       { dcer: '0.00%',  mos: '2.56' },
         expJ_s2:       { dcer: '0.00%',  mos: '1.47' },
         expK_s3:       { dcer: '0.00%',  mos: '2.06' },
+        expM_s3:       { dcer: '0.00%',  mos: '2.32' },
         pretrain_s_2k:  { dcer: '0.00%',  mos: '2.27' },
         pretrain_s_4k:  { dcer: '0.00%',  mos: '2.03' },
         pretrain_s_65k: { dcer: '0.00%',  mos: '2.01' },
@@ -966,6 +992,7 @@ const CN_METRICS = {
         expI_s2:       { dcer: '0.00%',  mos: '3.53' },
         expJ_s2:       { dcer: '0.00%',  mos: '1.66' },
         expK_s3:       { dcer: '0.00%',  mos: '1.32' },
+        expM_s3:       { dcer: '0.00%',  mos: '2.38' },
         pretrain_s_2k:  { dcer: '0.00%',  mos: '2.81' },
         pretrain_s_4k:  { dcer: '0.00%',  mos: '3.17' },
         pretrain_s_65k: { dcer: '0.00%',  mos: '3.09' },
@@ -989,6 +1016,7 @@ const CN_METRICS = {
         expI_s2:       { dcer: '0.00%',  mos: '3.66' },
         expJ_s2:       { dcer: '0.00%',  mos: '1.57' },
         expK_s3:       { dcer: '0.00%',  mos: '2.01' },
+        expM_s3:       { dcer: '15.38%', mos: '2.54' },
         pretrain_s_2k:  { dcer: '0.00%',  mos: '3.12' },
         pretrain_s_4k:  { dcer: '0.00%',  mos: '2.91' },
         pretrain_s_65k: { dcer: '0.00%',  mos: '3.31' },
@@ -1012,6 +1040,7 @@ const CN_METRICS = {
         expI_s2:       { dcer: '28.57%', mos: '3.39' },
         expJ_s2:       { dcer: '28.57%', mos: '1.72' },
         expK_s3:       { dcer: '14.29%', mos: '1.58' },
+        expM_s3:       { dcer: '50.00%', mos: '2.75' },
         pretrain_s_2k:  { dcer: '21.43%', mos: '3.22' },
         pretrain_s_4k:  { dcer: '21.43%', mos: '3.08' },
         pretrain_s_65k: { dcer: '21.43%', mos: '3.21' },
@@ -1035,6 +1064,7 @@ const CN_METRICS = {
         expI_s2:       { dcer: '30.00%', mos: '2.85' },
         expJ_s2:       { dcer: '10.00%', mos: '2.05' },
         expK_s3:       { dcer: '20.00%', mos: '2.55' },
+        expM_s3:       { dcer: '30.00%', mos: '2.29' },
         pretrain_s_2k:  { dcer: '20.00%', mos: '2.54' },
         pretrain_s_4k:  { dcer: '20.00%', mos: '2.43' },
         pretrain_s_65k: { dcer: '20.00%', mos: '2.34' },
@@ -1058,6 +1088,7 @@ const CN_METRICS = {
         expI_s2:       { dcer: '13.33%', mos: '3.14' },
         expJ_s2:       { dcer: '13.33%', mos: '1.39' },
         expK_s3:       { dcer: '13.33%', mos: '1.42' },
+        expM_s3:       { dcer: '60.00%', mos: '2.67' },
         pretrain_s_2k:  { dcer: '33.33%', mos: '2.54' },
         pretrain_s_4k:  { dcer: '20.00%', mos: '2.13' },
         pretrain_s_65k: { dcer: '46.67%', mos: '2.40' },
@@ -1083,6 +1114,7 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.48' },
         expJ_s2:       { dwer: '0.00%',   mos: '2.23' },
         expK_s3:       { dwer: '9.52%',   mos: '1.44' },
+        expM_s3:       { dwer: '0.00%',   mos: '3.00' },
         pretrain_s_2k:  { dwer: '0.00%',  mos: '3.01' },
         pretrain_s_4k:  { dwer: '0.00%',  mos: '2.65' },
         pretrain_s_65k: { dwer: '0.00%',  mos: '3.36' },
@@ -1105,6 +1137,7 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.31' },
         expJ_s2:       { dwer: '0.00%',   mos: '2.63' },
         expK_s3:       { dwer: '0.00%',   mos: '2.19' },
+        expM_s3:       { dwer: '21.05%',  mos: '3.02' },
         pretrain_s_2k:  { dwer: '0.00%',  mos: '4.36' },
         pretrain_s_4k:  { dwer: '0.00%',  mos: '4.11' },
         pretrain_s_65k: { dwer: '0.00%',  mos: '4.20' },
@@ -1127,6 +1160,7 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.36' },
         expJ_s2:       { dwer: '0.00%',   mos: '2.13' },
         expK_s3:       { dwer: '0.00%',   mos: '2.12' },
+        expM_s3:       { dwer: '0.00%',   mos: '2.67' },
         pretrain_s_2k:  { dwer: '0.00%',  mos: '3.28' },
         pretrain_s_4k:  { dwer: '0.00%',  mos: '3.76' },
         pretrain_s_65k: { dwer: '0.00%',  mos: '3.71' },
@@ -1149,6 +1183,7 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.31' },
         expJ_s2:       { dwer: '0.00%',   mos: '2.26' },
         expK_s3:       { dwer: '0.00%',   mos: '1.84' },
+        expM_s3:       { dwer: '11.76%',  mos: '3.57' },
         pretrain_s_2k:  { dwer: '0.00%',  mos: '4.01' },
         pretrain_s_4k:  { dwer: '0.00%',  mos: '4.02' },
         pretrain_s_65k: { dwer: '0.00%',  mos: '3.95' },
@@ -1171,6 +1206,7 @@ const EN_METRICS = {
         expI_s2:       { dwer: '16.22%',  mos: '3.32' },
         expJ_s2:       { dwer: '2.70%',   mos: '1.86' },
         expK_s3:       { dwer: '18.92%',  mos: '1.84' },
+        expM_s3:       { dwer: '24.32%',  mos: '2.69' },
         pretrain_s_2k:  { dwer: '0.00%',  mos: '4.00' },
         pretrain_s_4k:  { dwer: '0.00%',  mos: '3.94' },
         pretrain_s_65k: { dwer: '0.00%',  mos: '4.06' },
@@ -1193,6 +1229,7 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.53' },
         expJ_s2:       { dwer: '14.29%',  mos: '2.35' },
         expK_s3:       { dwer: '21.43%',  mos: '2.07' },
+        expM_s3:       { dwer: '14.29%',  mos: '2.58' },
         pretrain_s_2k:  { dwer: '0.00%',  mos: '4.06' },
         pretrain_s_4k:  { dwer: '0.00%',  mos: '4.06' },
         pretrain_s_65k: { dwer: '0.00%',  mos: '3.65' },
@@ -1215,6 +1252,7 @@ const EN_METRICS = {
         expI_s2:       { dwer: '0.00%',   mos: '3.62' },
         expJ_s2:       { dwer: '0.00%',   mos: '2.33' },
         expK_s3:       { dwer: '0.00%',   mos: '1.55' },
+        expM_s3:       { dwer: '0.00%',   mos: '2.80' },
         pretrain_s_2k:  { dwer: '7.69%',  mos: '3.93' },
         pretrain_s_4k:  { dwer: '7.69%',  mos: '3.87' },
         pretrain_s_65k: { dwer: '7.69%',  mos: '3.91' },
@@ -1254,6 +1292,7 @@ const CN_EXP_FILES = {
     focalV6:         'focal_v6.wav',
     focalV6_24k:     'focal_v6_24k.wav',
     focalSem6bit:    'focal_sem_6bit.wav',
+    expM_s3:         'exp_M_stage3.wav',
     expO_v9_v6_ep28: 'focal_expO_v9_v6_ep28.wav',
 };
 
@@ -1281,6 +1320,7 @@ const EN_EXP_FILES = {
     focalV6:         'focal_v6.wav',
     focalV6_24k:     'focal_v6_24k.wav',
     focalSem6bit:    'focal_sem_6bit.wav',
+    expM_s3:         'exp_M_stage3.wav',
     expO_v9_v6_ep28: 'focal_expO_v9_v6_ep28.wav',
 };
 
